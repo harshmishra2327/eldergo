@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElderGo+ | Companion Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg navbar-light elder-navbar">
+        <div class="container">
+
+            <a class="navbar-brand elder-logo" href="index.html">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+                ElderGo+
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarDashboard">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarDashboard">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="companion_dasboard.html">
+                            <i class="fa-solid fa-gauge-high me-1"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fa-solid fa-house me-1"></i> Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-3">
+                        <div class="user-profile-pill">
+                            <i class="fa-solid fa-user-nurse text-primary"></i>
+                            <span>Rahul Sharma (Companion)</span>
+                        </div>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <div class="form-check form-switch d-flex align-items-center gap-2 bg-white px-3 py-1 rounded-pill border">
+                            <input class="form-check-input mt-0 cursor-pointer" type="checkbox" id="availabilityToggle" checked onchange="toggleDutyStatus()">
+                            <label class="form-check-label small fw-bold text-success cursor-pointer" id="dutyStatusLabel" for="availabilityToggle">
+                                <i class="fa-solid fa-circle text-success small me-1"></i> On Duty (Available)
+                            </label>
+                        </div>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a href="#" onclick="logout(); return false;" class="btn btn-outline-primary nav-login-btn">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- ==================== MAIN DASHBOARD CONTAINER ==================== -->
+    <div class="dashboard-container">
+
+        <!-- Welcome Banner -->
+        <div class="dashboard-header-bar glass-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h2>
+                        <i class="fa-solid fa-user-shield text-primary"></i>
+                        Welcome Back, <span class="gradient-text">Rahul Sharma</span>
+                    </h2>
+                    <p>Manage incoming senior assistance requests, track live assignments, and view performance ratings.</p>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <div class="user-profile-pill">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        <span>Rating: <strong>4.9 / 5.0</strong></span>
+                    </div>
+                    <div class="user-profile-pill">
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                        <span>Status: <strong>Verified Companion</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Summary Stats Grid with Filters -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 text-primary fs-4 mb-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark">2</h4>
+                        <span class="text-muted small">New Requests</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-2 text-warning fs-4 mb-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="fa-solid fa-person-walking"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark">1</h4>
+                        <span class="text-muted small">Active Assistance</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobs Completed Card with Year & Month Filters -->
+            <div class="col-md-3 col-sm-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2 gap-1">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-2 text-success fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="d-flex gap-1 flex-grow-1 justify-content-end">
+                            <select class="form-select form-select-sm border-0 bg-light text-secondary fw-semibold cursor-pointer shadow-sm px-1 py-1" id="jobsYearFilter" onchange="filterJobsCompleted()" style="font-size: 0.72rem; max-width: 65px;" title="Select Year">
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="all">All Yrs</option>
+                            </select>
+                            <select class="form-select form-select-sm border-0 bg-light text-secondary fw-semibold cursor-pointer shadow-sm px-1 py-1" id="jobsMonthFilter" onchange="filterJobsCompleted()" style="font-size: 0.72rem; max-width: 82px;" title="Select Month/Period">
+                                <option value="all" selected>All Mths</option>
+                                <option value="this_week">This Wk</option>
+                                <option value="last_week">Last Wk</option>
+                                <option value="jan">Jan</option>
+                                <option value="feb">Feb</option>
+                                <option value="mar">Mar</option>
+                                <option value="apr">Apr</option>
+                                <option value="may">May</option>
+                                <option value="jun">Jun</option>
+                                <option value="jul">Jul</option>
+                                <option value="aug">Aug</option>
+                                <option value="sep">Sep</option>
+                                <option value="oct">Oct</option>
+                                <option value="nov">Nov</option>
+                                <option value="dec">Dec</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-baseline justify-content-between">
+                            <h4 class="mb-0 fw-bold text-dark" id="jobsCompletedCount">48</h4>
+                            <span class="badge bg-success bg-opacity-10 text-success extra-small fw-bold text-truncate" id="jobsPeriodTag" style="max-width: 110px;">2026 (All)</span>
+                        </div>
+                        <span class="text-muted small">Jobs Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Earnings Card with Year & Month Filters -->
+            <div class="col-md-3 col-sm-6">
+                <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-2 gap-1">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-2 text-info fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                        <div class="d-flex gap-1 flex-grow-1 justify-content-end">
+                            <select class="form-select form-select-sm border-0 bg-light text-secondary fw-semibold cursor-pointer shadow-sm px-1 py-1" id="earningsYearFilter" onchange="filterTotalEarnings()" style="font-size: 0.72rem; max-width: 65px;" title="Select Year">
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="all">All Yrs</option>
+                            </select>
+                            <select class="form-select form-select-sm border-0 bg-light text-secondary fw-semibold cursor-pointer shadow-sm px-1 py-1" id="earningsMonthFilter" onchange="filterTotalEarnings()" style="font-size: 0.72rem; max-width: 82px;" title="Select Month/Period">
+                                <option value="all" selected>All Mths</option>
+                                <option value="this_week">This Wk</option>
+                                <option value="last_week">Last Wk</option>
+                                <option value="jan">Jan</option>
+                                <option value="feb">Feb</option>
+                                <option value="mar">Mar</option>
+                                <option value="apr">Apr</option>
+                                <option value="may">May</option>
+                                <option value="jun">Jun</option>
+                                <option value="jul">Jul</option>
+                                <option value="aug">Aug</option>
+                                <option value="sep">Sep</option>
+                                <option value="oct">Oct</option>
+                                <option value="nov">Nov</option>
+                                <option value="dec">Dec</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-baseline justify-content-between">
+                            <h4 class="mb-0 fw-bold text-dark" id="totalEarningsCount">₹ 14,200</h4>
+                            <span class="badge bg-info bg-opacity-10 text-info extra-small fw-bold text-truncate" id="earningsPeriodTag" style="max-width: 110px;">2026 (All)</span>
+                        </div>
+                        <span class="text-muted small">Total Earnings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Grid Layout -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT SIDE: INCOMING & ACTIVE REQUESTS -->
+            <div>
+                <!-- ACTIVE / IN-PROGRESS JOB -->
+                <div class="dashboard-card glass-card mb-4 border-start border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="mb-0">
+                            <i class="fa-solid fa-spinner fa-spin text-warning me-2"></i>
+                            Current Active Job
+                        </h3>
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">In Transit</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 border">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-user-circle text-primary me-2"></i>
+                                    Mrs. Savitri Devi (Age 72)
+                                </h5>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Medical & Hospital Visit</span>
+                            </div>
+                            <a href="tel:9876543210" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                <i class="fa-solid fa-phone me-1"></i> Call Client
+                            </a>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="row g-2 text-secondary small">
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-location-dot me-1 text-danger"></i> Pickup:</strong> 
+                                4th Cross, Indiranagar, Bangalore
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-map-pin me-1 text-primary"></i> Destination:</strong> 
+                                Manipal Hospital, HAL Old Airport Rd
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-clock me-1 text-info"></i> Time:</strong> 
+                                Today at 10:30 AM (Duration: 3 Hours)
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-notes-medical me-1 text-warning"></i> Health Note:</strong> 
+                                Wheelchair required, diabetic patient.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Status Control -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase text-muted">Update Duty Status:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 active" id="statusBtn1" onclick="updateJobStage('Arrived at Pickup')">
+                                <i class="fa-solid fa-house-user me-1"></i> 1. Arrived at Location
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" id="statusBtn2" onclick="updateJobStage('In Transit to Destination')">
+                                <i class="fa-solid fa-person-walking me-1"></i> 2. Start Transit
+                            </button>
+                            <button class="btn btn-success btn-sm rounded-pill px-3 ms-auto" onclick="openCompleteJobModal()">
+                                <i class="fa-solid fa-circle-check me-1"></i> Mark Job Complete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INCOMING BOOKING REQUESTS -->
+                <div class="dashboard-card status-card glass-card">
+                    <h3 class="mb-3">
+                        <i class="fa-solid fa-bell text-primary"></i>
+                        New Service Requests
+                    </h3>
+
+                    <div class="active-bookings-list" id="incomingRequestsList">
+
+                        <!-- REQUEST ITEM 1 -->
+                        <div class="active-booking-item status-pending border-start border-4 border-info">
+                            <div class="booking-item-header">
+                                <span class="service-tag">
+                                    <i class="fa-solid fa-bag-shopping"></i>
+                                    Shopping & Outdoor Activity
+                                </span>
+                                <span class="status-badge pending">
+                                    New Request
+                                </span>
+                            </div>
+
+                            <div class="booking-item-details">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                                    Mr. Ramesh Kumar (Age 68)
+                                </h5>
+                                <p class="mb-1">
+                                    <strong>Route:</strong>
+                                    JP Nagar Phase 2
+                                    <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
+                                    Vega City Mall
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Schedule:</strong>
+                                    Tomorrow at 04:00 PM (Estimated: 2 hrs)
+                                </p>
+                                <p class="text-muted small fst-italic mb-0">
+                                    <strong>Special note:</strong> "Needs companion for grocery shopping & carrying bags."
+                                </p>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" onclick="acceptRequest(this, 'Mr. Ramesh Kumar')">
+                                    <i class="fa-solid fa-check me-1"></i> Accept Booking
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm px-3 rounded-pill fw-semibold" onclick="declineRequest(this)">
+                                    <i class="fa-solid fa-xmark me-1"></i> Decline
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- REQUEST ITEM 2 -->
+                        <div class="active-booking-item status-pending border-start border-4 border-info">
+                            <div class="booking-item-header">
+                                <span class="service-tag">
+                                    <i class="fa-solid fa-landmark"></i>
+                                    Banking & Routine Work
+                                </span>
+                                <span class="status-badge pending">
+                                    New Request
+                                </span>
+                            </div>
+
+                            <div class="booking-item-details">
+                                <h5 class="fw-bold mb-1">
+                                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                                    Mrs. Leela Venkatesh (Age 75)
+                                </h5>
+                                <p class="mb-1">
+                                    <strong>Route:</strong>
+                                    Jayanagar 4th Block
+                                    <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
+                                    SBI Bank Branch
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Schedule:</strong>
+                                    12 Aug 2026 at 11:00 AM (Estimated: 2.5 hrs)
+                                </p>
+                                <p class="text-muted small fst-italic mb-0">
+                                    <strong>Special note:</strong> "Assistance needed with bank document filling."
+                                </p>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" onclick="acceptRequest(this, 'Mrs. Leela Venkatesh')">
+                                    <i class="fa-solid fa-check me-1"></i> Accept Booking
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm px-3 rounded-pill fw-semibold" onclick="declineRequest(this)">
+                                    <i class="fa-solid fa-xmark me-1"></i> Decline
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- RIGHT SIDE: PROFILE & SCHEDULE HISTORY -->
+            <div>
+                <!-- COMPANION PROFILE SUMMARY -->
+                <div class="dashboard-card glass-card mb-4 text-center">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-4 d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                            <i class="fa-solid fa-user-nurse fs-1 text-primary"></i>
+                        </div>
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-white border-3 rounded-circle p-2" title="Online"></span>
+                    </div>
+
+                    <h4 class="fw-bold mb-1">Rahul Sharma</h4>
+                    <p class="text-muted small mb-2"><i class="fa-solid fa-shield-check text-primary me-1"></i> Certified Senior Care Assistant</p>
+
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge bg-light text-dark border">
+                            <i class="fa-solid fa-location-dot text-danger me-1"></i> Bangalore South
+                        </span>
+                        <span class="badge bg-light text-dark border">
+                            <i class="fa-solid fa-language text-info me-1"></i> English, Hindi, Kannada
+                        </span>
+                    </div>
+
+                    <div class="row g-2 text-start bg-light p-3 rounded-3 border mb-3 small">
+                        <div class="col-6">
+                            <span class="text-muted d-block">Experience:</span>
+                            <strong class="text-dark">4+ Years</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Police Verified:</span>
+                            <strong class="text-success"><i class="fa-solid fa-circle-check"></i> Passed</strong>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">First Aid Trained:</span>
+                            <strong class="text-success"><i class="fa-solid fa-circle-check"></i> Certified</strong>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Response Time:</span>
+                            <strong class="text-dark">&lt; 15 mins</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECENT FEEDBACK & REVIEWS -->
+                <div class="dashboard-card glass-card">
+                    <h3 class="mb-3">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        Recent Client Ratings
+                    </h3>
+
+                    <div id="companionFeedbackList" class="d-flex flex-column gap-3"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================== COMPLETE JOB MODAL ==================== -->
+    <div id="completeJobModal" class="modal">
+        <div class="modal-content glass-card">
+
+            <div class="modal-header">
+                <h3>Complete Service Job</h3>
+                <span class="close-modal" onclick="closeCompleteJobModal()">&times;</span>
+            </div>
+
+            <form onsubmit="event.preventDefault(); submitJobCompletion();">
+
+                <p class="text-center text-muted">
+                    Confirming completion of medical companion duty for <strong class="text-dark">Mrs. Savitri Devi</strong>.
+                </p>
+
+                <div class="form-group mt-3">
+                    <label><i class="fa-solid fa-clipboard-check text-primary"></i> Service Summary / Notes</label>
+                    <textarea rows="3" class="form-control" placeholder="Add any details about the visit or handoff notes..."></textarea>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label><i class="fa-solid fa-indian-rupee-sign text-success"></i> Payment Status</label>
+                    <select class="form-select">
+                        <option value="paid_online">Paid via ElderGo+ Online Wallet (₹600)</option>
+                        <option value="cash_collected">Cash Received directly from Client (₹600)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block mt-3 fw-bold">
+                    <i class="fa-solid fa-check-circle me-1"></i> Submit & Finish Duty
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+    // Year-wise and Month-wise Filter Data Matrix
+    const statsMatrix = {
+        "2026": {
+            all: { jobs: 48, earnings: 14200, monthName: "2026 (All)" },
+            this_week: { jobs: 6, earnings: 2100, monthName: "This Wk (2026)" },
+            last_week: { jobs: 12, earnings: 3800, monthName: "Last Wk (2026)" },
+            jan: { jobs: 5, earnings: 1500, monthName: "Jan 2026" },
+            feb: { jobs: 6, earnings: 1800, monthName: "Feb 2026" },
+            mar: { jobs: 7, earnings: 2100, monthName: "Mar 2026" },
+            apr: { jobs: 5, earnings: 1400, monthName: "Apr 2026" },
+            may: { jobs: 6, earnings: 1700, monthName: "May 2026" },
+            jun: { jobs: 7, earnings: 2100, monthName: "Jun 2026" },
+            jul: { jobs: 6, earnings: 1800, monthName: "Jul 2026" },
+            aug: { jobs: 6, earnings: 1800, monthName: "Aug 2026" },
+            sep: { jobs: 0, earnings: 0, monthName: "Sep 2026" },
+            oct: { jobs: 0, earnings: 0, monthName: "Oct 2026" },
+            nov: { jobs: 0, earnings: 0, monthName: "Nov 2026" },
+            dec: { jobs: 0, earnings: 0, monthName: "Dec 2026" }
+        },
+        "2025": {
+            all: { jobs: 64, earnings: 18600, monthName: "2025 (All)" },
+            this_week: { jobs: 0, earnings: 0, monthName: "This Wk (2025)" },
+            last_week: { jobs: 0, earnings: 0, monthName: "Last Wk (2025)" },
+            jan: { jobs: 5, earnings: 1400, monthName: "Jan 2025" },
+            feb: { jobs: 6, earnings: 1700, monthName: "Feb 2025" },
+            mar: { jobs: 5, earnings: 1500, monthName: "Mar 2025" },
+            apr: { jobs: 4, earnings: 1200, monthName: "Apr 2025" },
+            may: { jobs: 6, earnings: 1800, monthName: "May 2025" },
+            jun: { jobs: 5, earnings: 1500, monthName: "Jun 2025" },
+            jul: { jobs: 6, earnings: 1700, monthName: "Jul 2025" },
+            aug: { jobs: 5, earnings: 1400, monthName: "Aug 2025" },
+            sep: { jobs: 6, earnings: 1800, monthName: "Sep 2025" },
+            oct: { jobs: 5, earnings: 1500, monthName: "Oct 2025" },
+            nov: { jobs: 6, earnings: 1700, monthName: "Nov 2025" },
+            dec: { jobs: 5, earnings: 1400, monthName: "Dec 2025" }
+        },
+        "2024": {
+            all: { jobs: 32, earnings: 9400, monthName: "2024 (All)" },
+            this_week: { jobs: 0, earnings: 0, monthName: "This Wk (2024)" },
+            last_week: { jobs: 0, earnings: 0, monthName: "Last Wk (2024)" },
+            jan: { jobs: 2, earnings: 600, monthName: "Jan 2024" },
+            feb: { jobs: 3, earnings: 900, monthName: "Feb 2024" },
+            mar: { jobs: 2, earnings: 600, monthName: "Mar 2024" },
+            apr: { jobs: 3, earnings: 900, monthName: "Apr 2024" },
+            may: { jobs: 2, earnings: 600, monthName: "May 2024" },
+            jun: { jobs: 3, earnings: 900, monthName: "Jun 2024" },
+            jul: { jobs: 3, earnings: 900, monthName: "Jul 2024" },
+            aug: { jobs: 3, earnings: 800, monthName: "Aug 2024" },
+            sep: { jobs: 3, earnings: 900, monthName: "Sep 2024" },
+            oct: { jobs: 2, earnings: 600, monthName: "Oct 2024" },
+            nov: { jobs: 3, earnings: 900, monthName: "Nov 2024" },
+            dec: { jobs: 3, earnings: 800, monthName: "Dec 2024" }
+        },
+        "all": {
+            all: { jobs: 144, earnings: 42200, monthName: "All Time" },
+            this_week: { jobs: 6, earnings: 2100, monthName: "This Wk (All)" },
+            last_week: { jobs: 12, earnings: 3800, monthName: "Last Wk (All)" },
+            jan: { jobs: 12, earnings: 3500, monthName: "Jan (All)" },
+            feb: { jobs: 15, earnings: 4400, monthName: "Feb (All)" },
+            mar: { jobs: 14, earnings: 4200, monthName: "Mar (All)" },
+            apr: { jobs: 12, earnings: 3500, monthName: "Apr (All)" },
+            may: { jobs: 14, earnings: 4100, monthName: "May (All)" },
+            jun: { jobs: 15, earnings: 4500, monthName: "Jun (All)" },
+            jul: { jobs: 15, earnings: 4400, monthName: "Jul (All)" },
+            aug: { jobs: 14, earnings: 4000, monthName: "Aug (All)" },
+            sep: { jobs: 9, earnings: 2700, monthName: "Sep (All)" },
+            oct: { jobs: 7, earnings: 2100, monthName: "Oct (All)" },
+            nov: { jobs: 9, earnings: 2600, monthName: "Nov (All)" },
+            dec: { jobs: 8, earnings: 2200, monthName: "Dec (All)" }
+        }
+    };
+
+    function filterJobsCompleted() {
+        const year = document.getElementById('jobsYearFilter').value;
+        const month = document.getElementById('jobsMonthFilter').value;
+        const countEl = document.getElementById('jobsCompletedCount');
+        const tagEl = document.getElementById('jobsPeriodTag');
+        
+        if (!countEl || !tagEl) return;
+        
+        const yearData = statsMatrix[year] || statsMatrix['2026'];
+        const data = yearData[month] || yearData['all'];
+        
+        countEl.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        countEl.style.opacity = '0';
+        countEl.style.transform = 'translateY(-4px)';
+        
+        setTimeout(() => {
+            countEl.innerText = data.jobs;
+            tagEl.innerText = data.monthName;
+            countEl.style.opacity = '1';
+            countEl.style.transform = 'translateY(0)';
+        }, 150);
+    }
+
+    function filterTotalEarnings() {
+        const year = document.getElementById('earningsYearFilter').value;
+        const month = document.getElementById('earningsMonthFilter').value;
+        const amountEl = document.getElementById('totalEarningsCount');
+        const tagEl = document.getElementById('earningsPeriodTag');
+        
+        if (!amountEl || !tagEl) return;
+        
+        const yearData = statsMatrix[year] || statsMatrix['2026'];
+        const data = yearData[month] || yearData['all'];
+        
+        amountEl.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        amountEl.style.opacity = '0';
+        amountEl.style.transform = 'translateY(-4px)';
+        
+        setTimeout(() => {
+            amountEl.innerText = "₹ " + data.earnings.toLocaleString('en-IN');
+            tagEl.innerText = data.monthName;
+            amountEl.style.opacity = '1';
+            amountEl.style.transform = 'translateY(0)';
+        }, 150);
+    }
+
+    function toggleDutyStatus() {
+        const toggle = document.getElementById("availabilityToggle");
+        const label = document.getElementById("dutyStatusLabel");
+        
+        if (toggle.checked) {
+            label.innerHTML = '<i class="fa-solid fa-circle text-success small me-1"></i> On Duty (Available)';
+            label.className = "form-check-label small fw-bold text-success cursor-pointer";
+        } else {
+            label.innerHTML = '<i class="fa-solid fa-circle text-secondary small me-1"></i> Off Duty (Offline)';
+            label.className = "form-check-label small fw-bold text-secondary cursor-pointer";
+        }
+    }
+
+    function updateJobStage(stageName) {
+        alert("Duty Status Updated: " + stageName);
+    }
+
+    function openCompleteJobModal() {
+        document.getElementById("completeJobModal").style.display = "block";
+    }
+
+    function closeCompleteJobModal() {
+        document.getElementById("completeJobModal").style.display = "none";
+    }
+
+    function submitJobCompletion() {
+        closeCompleteJobModal();
+        alert("Service job marked as COMPLETED! Payment recorded.");
+    }
+
+    function renderCompanionFeedback() {
+        const container = document.getElementById('companionFeedbackList');
+        if (!container) return;
+
+        const allReviews = JSON.parse(localStorage.getItem('eldergo_feedbacks') || '[]');
+        const companionName = 'Rahul Sharma';
+        const reviews = allReviews.filter(review => review.companion === companionName).slice(0, 3);
+
+        if (!reviews.length) {
+            container.innerHTML = `
+                <div class="p-3 bg-light rounded-3 border">
+                    <p class="small text-secondary mb-0">No client feedback yet. Complete a job to receive your first rating.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = reviews.map(review => {
+            const stars = Array.from({ length: 5 }, (_, index) => {
+                if (index < review.rating) {
+                    return '<i class="fa-solid fa-star"></i>';
+                }
+                return '<i class="fa-regular fa-star"></i>';
+            }).join('');
+
+            const dateLabel = new Date(review.createdAt).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+
+            return `
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="small text-dark">${review.companion}</strong>
+                        <span class="text-warning small">${stars}</span>
+                    </div>
+                    <p class="small text-secondary mb-1">"${review.comment}"</p>
+                    <span class="text-muted extra-small">${dateLabel}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.addEventListener('load', renderCompanionFeedback);
+    window.addEventListener('storage', renderCompanionFeedback);
+
+    function acceptRequest(btnElement, clientName) {
+        const bookingCard = btnElement.closest('.active-booking-item');
+        bookingCard.style.transition = 'all 0.4s ease';
+        bookingCard.style.opacity = '0.5';
+        setTimeout(() => {
+            bookingCard.innerHTML = `
+                <div class="alert alert-success m-0 fw-bold">
+                    <i class="fa-solid fa-circle-check me-2"></i> Accepted booking for ${clientName}! Added to active schedule.
+                </div>
+            `;
+            bookingCard.style.opacity = '1';
+        }, 300);
+    }
+
+    function declineRequest(btnElement) {
+        if (confirm("Are you sure you want to decline this booking request?")) {
+            const bookingCard = btnElement.closest('.active-booking-item');
+            bookingCard.remove();
+        }
+    }
+
+    window.onclick = function(e) {
+        if (e.target == document.getElementById("completeJobModal")) {
+            closeCompleteJobModal();
+        }
+    }
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Authentication Helper -->
+    <script src="../static/js/auth.js"></script>
+
+</body>
+</html>

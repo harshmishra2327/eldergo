@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElderGo+ | Elderly Client Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg navbar-light elder-navbar">
+        <div class="container">
+
+            <a class="navbar-brand elder-logo" href="index.html">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+                ElderGo+
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarDashboard">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarDashboard">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="client_dashboard.html">
+                            <i class="fa-solid fa-gauge-high me-1"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fa-solid fa-house me-1"></i> Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-3">
+                        <div class="user-profile-pill">
+                            <i class="fa-solid fa-user-circle text-primary"></i>
+                            <span>Male (Age 68)</span>
+                        </div>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold" onclick="triggerEmergencySOS()">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> SOS Emergency
+                        </button>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a href="#" onclick="logout(); return false;" class="btn btn-outline-primary nav-login-btn">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- ==================== MAIN DASHBOARD CONTAINER ==================== -->
+    <div class="dashboard-container">
+
+        <!-- Welcome Banner -->
+        <div class="dashboard-header-bar glass-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h2>
+                        <i class="fa-solid fa-house-user text-primary"></i>
+                        Welcome Back, <span id="welcomeUserName" class="gradient-text">Client</span>
+                    </h2>
+                    <p>Book verified companions, track scheduled services in real-time, and access instant emergency support.</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="user-profile-pill">
+                        <i class="fa-solid fa-shield-heart text-success"></i>
+                        <span>Default Emergency Contact: <strong>9876543210</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Grid Layout -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT SIDE: REQUEST FORM -->
+            <div class="dashboard-card form-card glass-card">
+
+                <h3>
+                    <i class="fa-solid fa-calendar-plus text-primary"></i>
+                    Request Companion Support
+                </h3>
+
+                <form id="bookingForm" class="booking-form">
+
+                    <!-- Service Selection -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fa-solid fa-hand-holding-hand"></i>
+                            Assistance Required For
+                        </label>
+                        <select id="service_type" required>
+                            <option value="Medical & Hospital Visit">Medical & Hospital Visit</option>
+                            <option value="Shopping & Outdoor Activity">Shopping & Outdoor Activity</option>
+                            <option value="Travel & Transportation Support">Travel & Transportation Support</option>
+                            <option value="Daily Routine / Banking / Social Events">Daily Routine / Banking / Social Events</option>
+                        </select>
+                    </div>
+
+                    <!-- Date & Time Row -->
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-calendar-days"></i>
+                                Date
+                            </label>
+                            <input type="date" id="booking_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-clock"></i>
+                                Pickup Time
+                            </label>
+                            <input type="time" id="booking_time" value="10:30" required>
+                        </div>
+
+                    </div>
+
+                    <!-- Duration & Companion -->
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-hourglass-half"></i>
+                                Duration (Hours)
+                            </label>
+                            <input type="number" min="1" max="12" value="2" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-user-check"></i>
+                                Preferred Companion
+                            </label>
+                            <select>
+                                <option value="auto">Auto Assign Nearest Companion</option>
+                                <option value="rahul">Rahul Sharma ★4.8</option>
+                                <option value="anita">Anita Verma ★4.9</option>
+                                <option value="priya">Priya Singh ★4.7</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- Locations -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fa-solid fa-location-dot"></i>
+                            Pickup Address
+                        </label>
+                        <textarea rows="2" required placeholder="Enter home address or pickup location">JP Nagar 4th Phase, Bangalore</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            Destination / Activity Location
+                        </label>
+                        <input type="text" placeholder="e.g. Apollo Hospital / Orion Mall" value="Apollo Hospital" required>
+                    </div>
+
+                    <!-- Special Notes -->
+                    <div class="form-group">
+                        <label>
+                            <i class="fa-solid fa-notes-medical"></i>
+                            Health & Mobility Notes
+                        </label>
+                        <textarea rows="2" placeholder="e.g. Requires wheelchair support, diabetic, walking assistance...">Needs walking support and assistance with hospital registration desk.</textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" type="submit">
+                        Submit Companion Request
+                        <i class="fa-solid fa-paper-plane ms-2"></i>
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- RIGHT SIDE: ACTIVE REQUESTS STATUS -->
+            <div class="dashboard-card status-card glass-card">
+
+                <h3>
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+                    Active Request Status
+                </h3>
+
+                <div class="active-bookings-list">
+
+                    <!-- PENDING BOOKING -->
+                    <div class="active-booking-item status-pending">
+
+                        <div class="booking-item-header">
+                            <span class="service-tag">
+                                <i class="fa-solid fa-hospital-user"></i>
+                                Medical Visit
+                            </span>
+                            <span class="status-badge pending">
+                                Pending
+                            </span>
+                        </div>
+
+                        <div class="booking-item-details">
+                            <p>
+                                <strong>Route:</strong>
+                                JP Nagar
+                                <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
+                                Apollo Hospital
+                            </p>
+                            <p>
+                                <strong>Schedule:</strong>
+                                10 Aug 2026 at 10:30 AM (2 hrs)
+                            </p>
+                            <p class="text-muted small fst-italic">
+                                <strong>Special note:</strong> "Needs walking assistance & hospital registration."
+                            </p>
+                        </div>
+
+                        <div class="matching-loader">
+                            <div class="spinner"></div>
+                            <span>Connecting with available verified companions nearby...</span>
+                        </div>
+
+                        <button class="btn btn-outline-danger btn-sm fw-semibold">
+                            <i class="fa-solid fa-ban me-1"></i>
+                            Cancel Request
+                        </button>
+
+                    </div>
+
+
+                    <!-- ACCEPTED BOOKING -->
+                    <div class="active-booking-item status-accepted">
+
+                        <div class="booking-item-header">
+                            <span class="service-tag">
+                                <i class="fa-solid fa-bag-shopping"></i>
+                                Shopping & Outdoor
+                            </span>
+                            <span class="status-badge accepted">
+                                Accepted
+                            </span>
+                        </div>
+
+                        <div class="booking-item-details">
+                            <p>
+                                <strong>Route:</strong>
+                                JP Nagar
+                                <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
+                                Forum Mall
+                            </p>
+                            <p>
+                                <strong>Schedule:</strong>
+                                11 Aug 2026 at 11:00 AM (3 hrs)
+                            </p>
+                        </div>
+
+                        <div class="assigned-companion-info">
+                            <h4>Assigned Companion</h4>
+                            <div class="comp-profile-row">
+                                <div class="comp-avatar-circle">
+                                    <i class="fa-solid fa-user-nurse"></i>
+                                </div>
+                                <div class="comp-details">
+                                    <h5>Rahul Sharma</h5>
+                                    <p>
+                                        <span><i class="fa-solid fa-star text-warning"></i> 4.8 Rating</span>
+                                        <span><i class="fa-solid fa-phone text-success ms-2"></i> +91 9876543210</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="info-alert">
+                                <i class="fa-solid fa-circle-info"></i>
+                                Companion is setting up. Transit will begin shortly.
+                            </p>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="tel:9876543210" class="btn btn-phone btn-sm">
+                                <i class="fa-solid fa-phone me-1"></i> Call Companion
+                            </a>
+                            <button class="btn btn-outline-danger btn-sm fw-semibold ms-auto">
+                                <i class="fa-solid fa-ban me-1"></i> Cancel Booking
+                            </button>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ONGOING BOOKING & LIVE TRACKER -->
+                    <div class="active-booking-item status-ongoing">
+
+                        <div class="booking-item-header">
+                            <span class="service-tag">
+                                <i class="fa-solid fa-truck-medical"></i>
+                                Hospital Visit Transit
+                            </span>
+                            <span class="status-badge ongoing">
+                                Ongoing
+                            </span>
+                        </div>
+
+                        <div class="ongoing-tracker-card">
+
+                            <h4>
+                                <i class="fa-solid fa-location-dot text-success me-1"></i>
+                                Live Transit Tracking
+                            </h4>
+
+                            <div class="tracking-progress-steps">
+
+                                <div class="step active">
+                                    <div class="icon"><i class="fa-solid fa-check"></i></div>
+                                    <div class="text">Booked</div>
+                                </div>
+
+                                <div class="step active">
+                                    <div class="icon"><i class="fa-solid fa-user-check"></i></div>
+                                    <div class="text">Picked Up</div>
+                                </div>
+
+                                <div class="step active">
+                                    <div class="icon"><i class="fa-solid fa-person-walking"></i></div>
+                                    <div class="text">In Transit</div>
+                                </div>
+
+                                <div class="step">
+                                    <div class="icon"><i class="fa-solid fa-house-chimney"></i></div>
+                                    <div class="text">Return</div>
+                                </div>
+
+                            </div>
+
+                            <div class="companion-contact-mini">
+                                <span>
+                                    <strong>Active Companion:</strong> Rahul Sharma
+                                </span>
+                                <a href="tel:9876543210" class="btn-phone">
+                                    <i class="fa-solid fa-phone"></i> Call
+                                </a>
+                            </div>
+
+                            <div class="sos-container">
+                                <button class="btn btn-sos pulse-heavy" onclick="triggerEmergencySOS()">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    TRIGGER EMERGENCY SOS
+                                </button>
+                                <p class="sos-caption">
+                                    Clicking triggers immediate alert to family & emergency contact services.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3 text-end">
+                            <button class="btn btn-outline-primary btn-sm" onclick="openReviewModal('Rahul Sharma')">
+                                <i class="fa-solid fa-star me-1"></i> Rate Companion
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- COMPLETED BOOKING FEEDBACK -->
+                    <div class="active-booking-item status-completed">
+
+                        <div class="booking-item-header">
+                            <span class="service-tag">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Service Completed
+                            </span>
+                            <span class="status-badge completed">
+                                Completed
+                            </span>
+                        </div>
+
+                        <div class="completed-feedback-panel">
+                            <p>
+                                Your assistance has been completed. Please share your feedback so we can improve the service quality.
+                            </p>
+
+                            <div class="feedback-summary-row">
+                                <span><strong>Companion:</strong> Rahul Sharma</span>
+                                <span><strong>Visit:</strong> Apollo Hospital</span>
+                            </div>
+
+                            <button class="btn btn-primary btn-sm mt-2" onclick="openReviewModal('Rahul Sharma')">
+                                <i class="fa-solid fa-star me-1"></i>
+                                Leave Feedback
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================== REVIEW MODAL ==================== -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content glass-card">
+
+            <div class="modal-header">
+                <h3>Rate & Review Companion</h3>
+                <span class="close-modal" onclick="closeReviewModal()">&times;</span>
+            </div>
+
+            <form id="feedbackForm" onsubmit="submitClientFeedback(event)">
+
+                <p class="text-center text-muted">
+                    Please rate your experience with <strong id="modalCompanion" class="text-dark">Companion</strong>
+                </p>
+
+                <div class="rating-stars-input">
+                    <input type="radio" id="star5" name="rating" value="5">
+                    <label for="star5"><i class="fa-solid fa-star"></i></label>
+
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4"><i class="fa-solid fa-star"></i></label>
+
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3"><i class="fa-solid fa-star"></i></label>
+
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2"><i class="fa-solid fa-star"></i></label>
+
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1"><i class="fa-solid fa-star"></i></label>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label><i class="fa-solid fa-comment-dots text-primary"></i> Feedback</label>
+                    <textarea id="feedbackComment" rows="3" placeholder="Share your experience with the companion..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Submit Feedback
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== EMERGENCY SOS MODAL ==================== -->
+    <div id="sosAlertModal" class="modal emergency-modal">
+        <div class="modal-content glass-card">
+
+            <div class="sos-alarm-icon">
+                <i class="fa-solid fa-bell-exclamation pulse-heavy"></i>
+            </div>
+
+            <h3>EMERGENCY SOS ALERT TRIGGERED</h3>
+
+            <p id="sos-message" class="text-secondary">
+                Contacting emergency services and broadcasting live location to family contact (<strong>9876543210</strong>)...
+            </p>
+
+            <button class="btn btn-secondary mt-3 px-4 rounded-pill" onclick="closeSOSModal()">
+                <i class="fa-solid fa-shield-check me-1"></i> I Am Safe Now
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+    function openReviewModal(name) {
+        document.getElementById("modalCompanion").innerText = name;
+        document.getElementById("reviewModal").style.display = "block";
+    }
+
+    function submitClientFeedback(event) {
+        event.preventDefault();
+
+        const selectedRating = document.querySelector('input[name="rating"]:checked');
+        const feedbackText = document.getElementById('feedbackComment').value.trim();
+        const companionName = document.getElementById('modalCompanion').innerText || 'Rahul Sharma';
+
+        if (!selectedRating) {
+            alert('Please select a star rating before submitting.');
+            return;
+        }
+
+        const review = {
+            companion: companionName,
+            rating: Number(selectedRating.value),
+            comment: feedbackText || 'Very helpful and professional service.',
+            createdAt: new Date().toISOString()
+        };
+
+        const existingReviews = JSON.parse(localStorage.getItem('eldergo_feedbacks') || '[]');
+        existingReviews.push(review);
+        localStorage.setItem('eldergo_feedbacks', JSON.stringify(existingReviews));
+
+        closeReviewModal();
+        document.getElementById('feedbackForm').reset();
+        alert('Thank you for your feedback!');
+    }
+
+    function closeReviewModal() {
+        document.getElementById("reviewModal").style.display = "none";
+    }
+
+    function triggerEmergencySOS() {
+        document.getElementById("sosAlertModal").style.display = "block";
+    }
+
+    function closeSOSModal() {
+        document.getElementById("sosAlertModal").style.display = "none";
+    }
+
+    window.onclick = function(e) {
+        if (e.target == document.getElementById("reviewModal")) {
+            closeReviewModal();
+        }
+        if (e.target == document.getElementById("sosAlertModal")) {
+            closeSOSModal();
+        }
+    }
+
+    // Default booking date to today
+    document.getElementById("booking_date").valueAsDate = new Date();
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const savedUserName = localStorage.getItem('eldergo_username') || 'Client';
+        const welcomeName = document.getElementById('welcomeUserName');
+
+        if (welcomeName) {
+            welcomeName.textContent = savedUserName;
+        }
+    </script>
+
+    <!-- Authentication Helper -->
+    <script src="../static/js/auth.js"></script>
+
+</body>
+</html>

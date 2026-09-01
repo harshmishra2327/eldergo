@@ -775,6 +775,40 @@ function toggleOtherService() {
 
 }
 </script>
+<script>
+document.querySelector(".register-form").addEventListener("submit", async function(event) {
 
+    event.preventDefault();
+
+    const formData = new FormData(this);
+
+    const role = document.getElementById("role").value;
+
+    try {
+
+        const response = await fetch("http://localhost:8080/api/auth/register", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+
+        if (response.ok) {
+            alert(result);
+            console.log("Registration successful:", result);
+        } else {
+            alert("Registration failed: " + result);
+            console.error("Registration failed:", result);
+        }
+
+    } catch (error) {
+
+        console.error("Backend connection error:", error);
+        alert("Could not connect to ElderGo+ backend.");
+
+    }
+
+});
+</script>
 </body>
 </html>

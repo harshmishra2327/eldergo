@@ -502,6 +502,16 @@
 
     <!-- Authentication Helper -->
     <script src="../static/js/auth.js"></script>
+    <script>
+fetch("http://localhost:8080/api/test")
+    .then(response => response.text())
+    .then(data => {
+        console.log("Backend response:", data);
+    })
+    .catch(error => {
+        console.error("Backend connection failed:", error);
+    });
+</script>
 
 </body>
 

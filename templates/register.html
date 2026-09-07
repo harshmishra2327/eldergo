@@ -132,10 +132,17 @@
         <p>Join ElderGo+ Companion Assistance Platform</p>
     </div>
 
+    <!-- Registration Alert Notification -->
+    <div id="registerSuccessAlert" class="alert alert-success shadow-sm rounded-3 mb-4" style="display: none; border-left: 5px solid #10b981;">
+        <i class="fa-solid fa-circle-check me-2 text-success fs-5"></i>
+        <span>Registration completed successfully! Storing details and redirecting...</span>
+    </div>
+
 
     <!-- Registration Form -->
     <form
-        action="#"
+        id="registerForm"
+        onsubmit="handleRegisterSubmit(event)"
         method="POST"
         enctype="multipart/form-data"
         class="auth-form register-form"
@@ -206,6 +213,25 @@
                     id="password"
                     name="password"
                     placeholder="Create password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+
+                <label for="confirm_password">
+                    <i class="fa-solid fa-lock"></i>
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Confirm password"
                     required
                 >
 
@@ -661,7 +687,7 @@
 
         <p>
             Already have an account?
-            <a href="login.html">
+            <a href="/login">
                 Login here
             </a>
         </p>
@@ -773,6 +799,70 @@ function toggleOtherService() {
         otherInput.value = '';
     }
 
+}
+
+function handleRegisterSubmit(e) {
+    e.preventDefault();
+    const role = document.getElementById('role').value;
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassEl = document.getElementById('confirm_password');
+    const confirmPassword = confirmPassEl ? confirmPassEl.value.trim() : password;
+    const fullName = document.getElementById('full_name') ? document.getElementById('full_name').value.trim() : username;
+    const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+    const address = document.getElementById('address') ? document.getElementById('address').value.trim() : '';
+    const ageEl = document.getElementById('age');
+    const genderEl = document.getElementById('gender');
+    const age = ageEl && ageEl.value ? parseInt(ageEl.value) : null;
+    const gender = genderEl ? genderEl.value : 'Male';
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    const payload = {
+        role, username, email, password, fullName, phone, age, gender, address
+    };
+
+    if (role === 'client') {
+        const emContact = document.getElementById('emergency_contact');
+        if (emContact) payload.emergencyContact = emContact.value.trim();
+    } else {
+        const cityEl = document.getElementById('city');
+        const prefEl = document.getElementById('preferred_service');
+        const rateEl = document.getElementById('hourly_rate');
+        if (cityEl) payload.city = cityEl.value;
+        if (prefEl) payload.preferredService = prefEl.value;
+        if (rateEl) payload.hourlyRate = rateEl.value;
+    }
+
+    fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem('eldergo_username', data.user.username);
+            localStorage.setItem('eldergo_role', data.user.role);
+            const alertBox = document.getElementById('registerSuccessAlert');
+            if (alertBox) {
+                alertBox.style.display = 'block';
+            }
+            alert("Registration completed successfully!");
+            setTimeout(() => {
+                window.location.href = '/' + data.redirect.replace(/^\//, '');
+            }, 800);
+        } else {
+            alert(data.message || "Registration failed.");
+        }
+    })
+    .catch(err => {
+        alert("Error connecting to backend: " + err);
+    });
 }
 </script>
 <script>

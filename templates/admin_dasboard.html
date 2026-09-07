@@ -21,7 +21,7 @@
         <div class="container-fluid px-4">
 
             <!-- ElderGo+ Logo -->
-            <a class="navbar-brand elder-logo d-flex align-items-center" href="index.html">
+            <a class="navbar-brand elder-logo d-flex align-items-center" href="/">
                 <i class="fa-solid fa-hand-holding-heart me-2"></i>
                 ElderGo+
                 <span class="badge bg-primary fs-6 fw-bold ms-2 px-2 py-1 align-middle" style="font-size: 0.65rem !important; border-radius: 6px;">ADMIN</span>
@@ -138,12 +138,12 @@
             <div class="row g-3 mb-4">
 
                 <!-- Card 1: Total Clients -->
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="admin-stat-card">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="stat-label">Total Clients</div>
-                                <div class="stat-count">1,428</div>
+                                <div class="stat-count" id="statClientsCount">1,428</div>
                             </div>
                             <div class="stat-icon-wrapper stat-icon-primary">
                                 <i class="fa-solid fa-users"></i>
@@ -153,12 +153,12 @@
                 </div>
 
                 <!-- Card 2: Total Companions -->
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="admin-stat-card">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="stat-label">Total Companions</div>
-                                <div class="stat-count">384</div>
+                                <div class="stat-count" id="statCompanionsCount">384</div>
                             </div>
                             <div class="stat-icon-wrapper stat-icon-info">
                                 <i class="fa-solid fa-user-nurse"></i>
@@ -173,7 +173,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="stat-label">Pending Verification</div>
-                                <div class="stat-count text-warning">18</div>
+                                <div class="stat-count text-warning" id="statPendingCount">18</div>
                             </div>
                             <div class="stat-icon-wrapper stat-icon-warning">
                                 <i class="fa-solid fa-id-card"></i>
@@ -183,15 +183,30 @@
                 </div>
 
                 <!-- Card 4: Active Bookings -->
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="admin-stat-card">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="stat-label">Active Bookings</div>
-                                <div class="stat-count text-success">42</div>
+                                <div class="stat-count text-success" id="statBookingsCount">42</div>
                             </div>
                             <div class="stat-icon-wrapper stat-icon-success">
                                 <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Active Rides -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="admin-stat-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="stat-label">Live Active Rides</div>
+                                <div class="stat-count text-primary" id="statActiveRidesCount">12</div>
+                            </div>
+                            <div class="stat-icon-wrapper stat-icon-primary">
+                                <i class="fa-solid fa-person-walking-luggage"></i>
                             </div>
                         </div>
                     </div>
@@ -215,12 +230,12 @@
                         <span class="input-group-text bg-white text-muted border-end-0">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search clients by name, email, phone or address...">
+                        <input type="text" id="clientSearchInput" onkeyup="filterClientTable()" class="form-control border-start-0 ps-0" placeholder="Search clients by name, email, phone or address...">
                     </div>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle admin-table">
+                    <table class="table table-hover align-middle admin-table" id="clientsTable">
                         <thead>
                             <tr>
                                 <th>Profile Photo</th>
@@ -233,73 +248,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Client 1 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm">RS</div>
-                                </td>
-                                <td class="fw-bold text-dark">Ramesh Sen</td>
-                                <td>ramesh.sen@gmail.com</td>
-                                <td>+91 98765 43210</td>
-                                <td>Koramangala 4th Block, Bengaluru</td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                        <i class="fa-solid fa-eye me-1"></i> View Details
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Client 2 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-warning">SD</div>
-                                </td>
-                                <td class="fw-bold text-dark">Savitri Devi</td>
-                                <td>savitri.d@yahoo.com</td>
-                                <td>+91 94480 55432</td>
-                                <td>Jayanagar 7th Block, Bengaluru</td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                        <i class="fa-solid fa-eye me-1"></i> View Details
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Client 3 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-info">LN</div>
-                                </td>
-                                <td class="fw-bold text-dark">Dr. K. L. Narayana</td>
-                                <td>dr.narayana@hotmail.com</td>
-                                <td>+91 98451 99887</td>
-                                <td>Indiranagar 100ft Road, Bengaluru</td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                        <i class="fa-solid fa-eye me-1"></i> View Details
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Client 4 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-danger">AP</div>
-                                </td>
-                                <td class="fw-bold text-dark">Anand B. Patil</td>
-                                <td>anand.patil@outlook.com</td>
-                                <td>+91 91081 22334</td>
-                                <td>Malleshwaram 15th Cross, Bengaluru</td>
-                                <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Inactive</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                        <i class="fa-solid fa-eye me-1"></i> View Details
-                                    </button>
-                                </td>
-                            </tr>
+                            <!-- Populated dynamically from MySQL database -->
                         </tbody>
                     </table>
                 </div>
@@ -321,12 +270,12 @@
                         <span class="input-group-text bg-white text-muted border-end-0">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0" placeholder="Search companions by name, city, phone or preferred service...">
+                        <input type="text" id="companionSearchInput" onkeyup="filterCompanionTable()" class="form-control border-start-0 ps-0" placeholder="Search companions by name, city, phone or preferred service...">
                     </div>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle admin-table">
+                    <table class="table table-hover align-middle admin-table" id="companionsTable">
                         <thead>
                             <tr>
                                 <th>Profile Photo</th>
@@ -340,77 +289,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Companion 1 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-success">RS</div>
-                                </td>
-                                <td class="fw-bold text-dark">Rahul Sharma</td>
-                                <td>Bengaluru</td>
-                                <td>+91 98450 12345</td>
-                                <td><span class="badge bg-light text-dark border">Medical & Hospital Visit</span></td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill"><i class="fa-solid fa-circle text-success me-1 small"></i> Available</span></td>
-                                <td><span class="badge bg-success text-white rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> Verified</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#companionModal">
-                                        <i class="fa-solid fa-user-circle me-1"></i> View Profile
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Companion 2 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-primary">SK</div>
-                                </td>
-                                <td class="fw-bold text-dark">Suresh Kumar M.</td>
-                                <td>Bengaluru</td>
-                                <td>+91 98112 34567</td>
-                                <td><span class="badge bg-light text-dark border">Shopping & Outdoor</span></td>
-                                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill"><i class="fa-solid fa-circle text-success me-1 small"></i> Available</span></td>
-                                <td><span class="badge bg-success text-white rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> Verified</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#companionModal">
-                                        <i class="fa-solid fa-user-circle me-1"></i> View Profile
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Companion 3 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-secondary">PN</div>
-                                </td>
-                                <td class="fw-bold text-dark">Priya Nair</td>
-                                <td>Mysuru</td>
-                                <td>+91 97400 66778</td>
-                                <td><span class="badge bg-light text-dark border">Daily Routine / Banking</span></td>
-                                <td><span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill"><i class="fa-solid fa-circle text-secondary me-1 small"></i> Off Duty</span></td>
-                                <td><span class="badge bg-success text-white rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> Verified</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#companionModal">
-                                        <i class="fa-solid fa-user-circle me-1"></i> View Profile
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Companion 4 -->
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-sm bg-info">KR</div>
-                                </td>
-                                <td class="fw-bold text-dark">Kavitha Reddy</td>
-                                <td>Bengaluru</td>
-                                <td>+91 97312 88900</td>
-                                <td><span class="badge bg-light text-dark border">Medical & Hospital Visit</span></td>
-                                <td><span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Under Audit</span></td>
-                                <td><span class="badge bg-warning text-dark rounded-pill"><i class="fa-solid fa-hourglass-half me-1"></i> Pending</span></td>
-                                <td class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#companionModal">
-                                        <i class="fa-solid fa-user-circle me-1"></i> View Profile
-                                    </button>
-                                </td>
-                            </tr>
+                            <!-- Populated dynamically from MySQL database -->
                         </tbody>
                     </table>
                 </div>
@@ -426,11 +305,11 @@
                             Pending Companion Verification Requests
                         </h3>
                     </div>
-                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fw-bold">18 Applications Pending</span>
+                    <span id="verifBadgeHeader" class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fw-bold">18 Applications Pending</span>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle admin-table">
+                    <table class="table table-hover align-middle admin-table" id="verificationTable">
                         <thead>
                             <tr>
                                 <th>Companion Photo</th>
@@ -462,10 +341,10 @@
                                     <button class="btn btn-outline-info btn-sm rounded-pill me-1" data-bs-toggle="modal" data-bs-target="#docModal">
                                         <i class="fa-solid fa-file-lines me-1"></i> View Document
                                     </button>
-                                    <button class="btn btn-success btn-sm rounded-pill me-1 fw-bold">
+                                    <button class="btn btn-success btn-sm rounded-pill me-1 fw-bold" onclick="approveCompanion(this, 'Kavitha Reddy')">
                                         <i class="fa-solid fa-check me-1"></i> Approve
                                     </button>
-                                    <button class="btn btn-danger btn-sm rounded-pill fw-bold">
+                                    <button class="btn btn-danger btn-sm rounded-pill fw-bold" onclick="rejectCompanion(this, 'Kavitha Reddy')">
                                         <i class="fa-solid fa-xmark me-1"></i> Reject
                                     </button>
                                 </td>
@@ -491,10 +370,10 @@
                                     <button class="btn btn-outline-info btn-sm rounded-pill me-1" data-bs-toggle="modal" data-bs-target="#docModal">
                                         <i class="fa-solid fa-file-lines me-1"></i> View Document
                                     </button>
-                                    <button class="btn btn-success btn-sm rounded-pill me-1 fw-bold">
+                                    <button class="btn btn-success btn-sm rounded-pill me-1 fw-bold" onclick="approveCompanion(this, 'Suresh Kumar M.')">
                                         <i class="fa-solid fa-check me-1"></i> Approve
                                     </button>
-                                    <button class="btn btn-danger btn-sm rounded-pill fw-bold">
+                                    <button class="btn btn-danger btn-sm rounded-pill fw-bold" onclick="rejectCompanion(this, 'Suresh Kumar M.')">
                                         <i class="fa-solid fa-xmark me-1"></i> Reject
                                     </button>
                                 </td>
@@ -514,8 +393,18 @@
                     </h3>
                 </div>
 
+                <!-- Search Bar for Bookings -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="bookingSearchInput" onkeyup="filterBookingTable()" class="form-control border-start-0 ps-0" placeholder="Search bookings by ID, client, companion or status...">
+                    </div>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle admin-table">
+                    <table class="table table-hover align-middle admin-table" id="bookingsTable">
                         <thead>
                             <tr>
                                 <th>Booking ID</th>
@@ -783,6 +672,196 @@
         </div>
     </div>
 
+
+    <!-- JAVASCRIPT SEARCH & VERIFICATION LOGIC -->
+    <script>
+    let pendingVerifCount = 18;
+
+    function filterClientTable() {
+        const input = document.getElementById('clientSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#clientsTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(input) ? '' : 'none';
+        });
+    }
+
+    function filterCompanionTable() {
+        const input = document.getElementById('companionSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#companionsTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(input) ? '' : 'none';
+        });
+    }
+
+    function filterBookingTable() {
+        const input = document.getElementById('bookingSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#bookingsTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(input) ? '' : 'none';
+        });
+    }
+
+    function approveCompanion(btnElement, name) {
+        const row = btnElement.closest('tr');
+        row.style.transition = 'all 0.4s ease';
+        row.style.background = '#dcfce7';
+
+        setTimeout(() => {
+            btnElement.parentElement.innerHTML = `
+                <span class="badge bg-success text-white rounded-pill p-2">
+                    <i class="fa-solid fa-circle-check me-1"></i> Verified & Approved
+                </span>
+            `;
+            updatePendingCounter();
+        }, 300);
+    }
+
+    function rejectCompanion(btnElement, name) {
+        if (confirm("Are you sure you want to reject verification for " + name + "?")) {
+            const row = btnElement.closest('tr');
+            row.style.transition = 'all 0.4s ease';
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.remove();
+                updatePendingCounter();
+            }, 400);
+        }
+    }
+
+    function loadAdminStats() {
+        fetch('/api/admin/stats')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.stats) {
+                    const elClients = document.getElementById('statClientsCount');
+                    const elCompanions = document.getElementById('statCompanionsCount');
+                    const elPending = document.getElementById('statPendingCount');
+                    const elBookings = document.getElementById('statBookingsCount');
+                    const elRides = document.getElementById('statActiveRidesCount');
+                    if (elClients) elClients.innerText = data.stats.clients;
+                    if (elCompanions) elCompanions.innerText = data.stats.companions;
+                    if (elPending) elPending.innerText = data.stats.pendingVerifications;
+                    if (elBookings) elBookings.innerText = data.stats.activeBookings;
+                    if (elRides) elRides.innerText = data.stats.activeRides;
+                }
+            })
+            .catch(err => console.error("Error loading admin stats:", err));
+    }
+
+    function loadAdminClients() {
+        fetch('/api/admin/clients')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.clients) {
+                    const tbody = document.querySelector('#clientsTable tbody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+
+                    if (data.clients.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="text-center text-muted p-4">
+                                    <i class="fa-solid fa-users-slash fs-3 mb-2 d-block text-secondary"></i>
+                                    No registered clients in database yet.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    data.clients.forEach(c => {
+                        const nameParts = (c.full_name || c.username || 'Client').split(' ');
+                        const initials = nameParts.length > 1 ? (nameParts[0][0] + nameParts[1][0]).toUpperCase() : nameParts[0].substring(0, 2).toUpperCase();
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="user-avatar-sm bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%;">${initials}</div>
+                            </td>
+                            <td class="fw-bold text-dark">
+                                ${c.full_name || c.username}
+                                ${c.age ? `<br><small class="text-muted">${c.gender || ''} (Age ${c.age})</small>` : ''}
+                            </td>
+                            <td>${c.email}</td>
+                            <td>${c.phone || 'N/A'}</td>
+                            <td>${c.address || 'Bengaluru'}</td>
+                            <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="alert('Client: ${c.full_name}\\nEmail: ${c.email}\\nPhone: ${c.phone || 'N/A'}\\nAge: ${c.age || 'N/A'}\\nGender: ${c.gender || 'N/A'}\\nEmergency Contact: ${c.emergency_contact || 'N/A'}')">
+                                    <i class="fa-solid fa-eye me-1"></i> View Details
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            })
+            .catch(err => console.error("Error loading admin clients:", err));
+    }
+
+    function loadAdminCompanions() {
+        fetch('/api/admin/companions')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.companions) {
+                    const tbody = document.querySelector('#companionsTable tbody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+
+                    if (data.companions.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8" class="text-center text-muted p-4">
+                                    <i class="fa-solid fa-user-slash fs-3 mb-2 d-block text-secondary"></i>
+                                    No registered companions in database yet.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    data.companions.forEach(c => {
+                        const nameParts = (c.full_name || c.username || 'Companion').split(' ');
+                        const initials = nameParts.length > 1 ? (nameParts[0][0] + nameParts[1][0]).toUpperCase() : nameParts[0].substring(0, 2).toUpperCase();
+                        const statusBadge = c.verification_status === 'verified' ?
+                            '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Verified</span>' :
+                            '<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">Pending Verification</span>';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div class="user-avatar-sm bg-success text-white fw-bold d-flex align-items-center justify-content-center" style="width:36px; height:36px; border-radius:50%;">${initials}</div>
+                            </td>
+                            <td class="fw-bold text-dark">
+                                ${c.full_name || c.username}
+                                ${c.age ? `<br><small class="text-muted">${c.gender || ''} (Age ${c.age})</small>` : ''}
+                            </td>
+                            <td>${c.city || 'Bengaluru'}</td>
+                            <td>${c.phone || 'N/A'}</td>
+                            <td>${c.preferred_service || 'Medical & Hospital Visit'}</td>
+                            <td><span class="badge bg-success text-white rounded-pill"><i class="fa-solid fa-circle me-1 small"></i> Online</span></td>
+                            <td>${statusBadge}</td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="alert('Companion: ${c.full_name}\\nEmail: ${c.email}\\nCity: ${c.city || 'Bengaluru'}\\nHourly Rate: ₹${c.hourly_rate || 250}/hr')">
+                                    <i class="fa-solid fa-eye me-1"></i> View Profile
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            })
+            .catch(err => console.error("Error loading admin companions:", err));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadAdminStats();
+        loadAdminClients();
+        loadAdminCompanions();
+    });
+    </script>
 
     <!-- Bootstrap 5 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

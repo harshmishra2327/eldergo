@@ -11,6 +11,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
+    <!-- Leaflet OpenStreetMap CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../static/css/style.css">
 </head>
@@ -20,7 +24,7 @@
     <nav class="navbar navbar-expand-lg navbar-light elder-navbar">
         <div class="container">
 
-            <a class="navbar-brand elder-logo" href="index.html">
+            <a class="navbar-brand elder-logo" href="/">
                 <i class="fa-solid fa-hand-holding-heart"></i>
                 ElderGo+
             </a>
@@ -34,13 +38,13 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
 
                     <li class="nav-item">
-                        <a class="nav-link active" href="client_dashboard.html">
+                        <a class="nav-link active" href="/client-dashboard">
                             <i class="fa-solid fa-gauge-high me-1"></i> Dashboard
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">
+                        <a class="nav-link" href="/">
                             <i class="fa-solid fa-house me-1"></i> Home
                         </a>
                     </li>
@@ -48,7 +52,7 @@
                     <li class="nav-item ms-lg-3">
                         <div class="user-profile-pill">
                             <i class="fa-solid fa-user-circle text-primary"></i>
-                            <span>Male (Age 68)</span>
+                            <span id="userGenderAgeDisplay">Client Profile</span>
                         </div>
                     </li>
 
@@ -87,7 +91,7 @@
                 <div class="d-flex align-items-center gap-2">
                     <div class="user-profile-pill">
                         <i class="fa-solid fa-shield-heart text-success"></i>
-                        <span>Default Emergency Contact: <strong>9876543210</strong></span>
+                        <span>Emergency Contact: <strong id="userEmergencyContactDisplay">Loading...</strong></span>
                     </div>
                 </div>
             </div>
@@ -105,11 +109,11 @@
                     Request Companion Support
                 </h3>
 
-                <form id="bookingForm" class="booking-form">
+                <form id="bookingForm" class="booking-form" onsubmit="handleClientBookingSubmit(event)">
 
                     <!-- Service Selection -->
                     <div class="form-group">
-                        <label>
+                        <label for="service_type">
                             <i class="fa-solid fa-hand-holding-hand"></i>
                             Assistance Required For
                         </label>
@@ -125,7 +129,7 @@
                     <div class="form-grid">
 
                         <div class="form-group">
-                            <label>
+                            <label for="booking_date">
                                 <i class="fa-solid fa-calendar-days"></i>
                                 Date
                             </label>
@@ -133,11 +137,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label>
+                            <label for="booking_time">
                                 <i class="fa-solid fa-clock"></i>
                                 Pickup Time
                             </label>
                             <input type="time" id="booking_time" value="10:30" required>
+                            <div id="bookingDateTimeError" class="text-danger small mt-1" role="alert" aria-live="polite"></div>
                         </div>
 
                     </div>
@@ -146,23 +151,23 @@
                     <div class="form-grid">
 
                         <div class="form-group">
-                            <label>
+                            <label for="booking_duration">
                                 <i class="fa-solid fa-hourglass-half"></i>
                                 Duration (Hours)
                             </label>
-                            <input type="number" min="1" max="12" value="2" required>
+                            <input type="number" id="booking_duration" min="1" max="12" value="2" required>
                         </div>
 
                         <div class="form-group">
-                            <label>
+                            <label for="preferred_companion">
                                 <i class="fa-solid fa-user-check"></i>
                                 Preferred Companion
                             </label>
-                            <select>
+                            <select id="preferred_companion">
                                 <option value="auto">Auto Assign Nearest Companion</option>
-                                <option value="rahul">Rahul Sharma ★4.8</option>
-                                <option value="anita">Anita Verma ★4.9</option>
-                                <option value="priya">Priya Singh ★4.7</option>
+                                <option value="rahul">Rahul Sharma ★4.9 (₹250/hr)</option>
+                                <option value="anita">Anita Verma ★4.8 (₹300/hr)</option>
+                                <option value="priya">Priya Singh ★4.7 (₹280/hr)</option>
                             </select>
                         </div>
 
@@ -170,33 +175,33 @@
 
                     <!-- Locations -->
                     <div class="form-group">
-                        <label>
-                            <i class="fa-solid fa-location-dot"></i>
+                        <label for="pickup_address">
+                            <i class="fa-solid fa-location-dot text-danger"></i>
                             Pickup Address
                         </label>
-                        <textarea rows="2" required placeholder="Enter home address or pickup location">JP Nagar 4th Phase, Bangalore</textarea>
+                        <textarea id="pickup_address" rows="2" required placeholder="Enter home address or pickup location">JP Nagar 4th Phase, Bangalore</textarea>
                     </div>
 
                     <div class="form-group">
-                        <label>
-                            <i class="fa-solid fa-map-location-dot"></i>
+                        <label for="destination_address">
+                            <i class="fa-solid fa-map-location-dot text-primary"></i>
                             Destination / Activity Location
                         </label>
-                        <input type="text" placeholder="e.g. Apollo Hospital / Orion Mall" value="Apollo Hospital" required>
+                        <input type="text" id="destination_address" placeholder="e.g. Apollo Hospital / Orion Mall" value="Apollo Hospital, Bannerghatta Rd" required>
                     </div>
 
                     <!-- Special Notes -->
                     <div class="form-group">
-                        <label>
+                        <label for="health_notes">
                             <i class="fa-solid fa-notes-medical"></i>
                             Health & Mobility Notes
                         </label>
-                        <textarea rows="2" placeholder="e.g. Requires wheelchair support, diabetic, walking assistance...">Needs walking support and assistance with hospital registration desk.</textarea>
+                        <textarea id="health_notes" rows="2" placeholder="e.g. Requires wheelchair support, diabetic, walking assistance...">Needs walking support and assistance with hospital registration desk.</textarea>
                     </div>
 
-                    <button class="btn btn-primary btn-block" type="submit">
-                        Submit Companion Request
-                        <i class="fa-solid fa-paper-plane ms-2"></i>
+                    <button class="btn btn-primary btn-block py-3 fw-bold fs-6" type="submit" id="findCompanionBtn">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i>
+                        Find Companion
                     </button>
 
                 </form>
@@ -204,224 +209,85 @@
             </div>
 
 
-            <!-- RIGHT SIDE: ACTIVE REQUESTS STATUS -->
+            <!-- RIGHT SIDE: ACTIVE REQUEST STATUS CONTAINER -->
             <div class="dashboard-card status-card glass-card">
 
-                <h3>
-                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>
-                    Active Request Status
-                </h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">
+                        <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>
+                        Active Booking Status
+                    </h3>
+                    <span id="demoControlBadge" class="badge bg-light text-secondary border extra-small">Live Sync</span>
+                </div>
 
-                <div class="active-bookings-list">
-
-                    <!-- PENDING BOOKING -->
-                    <div class="active-booking-item status-pending">
-
-                        <div class="booking-item-header">
-                            <span class="service-tag">
-                                <i class="fa-solid fa-hospital-user"></i>
-                                Medical Visit
-                            </span>
-                            <span class="status-badge pending">
-                                Pending
-                            </span>
-                        </div>
-
-                        <div class="booking-item-details">
-                            <p>
-                                <strong>Route:</strong>
-                                JP Nagar
-                                <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
-                                Apollo Hospital
-                            </p>
-                            <p>
-                                <strong>Schedule:</strong>
-                                10 Aug 2026 at 10:30 AM (2 hrs)
-                            </p>
-                            <p class="text-muted small fst-italic">
-                                <strong>Special note:</strong> "Needs walking assistance & hospital registration."
-                            </p>
-                        </div>
-
-                        <div class="matching-loader">
-                            <div class="spinner"></div>
-                            <span>Connecting with available verified companions nearby...</span>
-                        </div>
-
-                        <button class="btn btn-outline-danger btn-sm fw-semibold">
-                            <i class="fa-solid fa-ban me-1"></i>
-                            Cancel Request
-                        </button>
-
-                    </div>
-
-
-                    <!-- ACCEPTED BOOKING -->
-                    <div class="active-booking-item status-accepted">
-
-                        <div class="booking-item-header">
-                            <span class="service-tag">
-                                <i class="fa-solid fa-bag-shopping"></i>
-                                Shopping & Outdoor
-                            </span>
-                            <span class="status-badge accepted">
-                                Accepted
-                            </span>
-                        </div>
-
-                        <div class="booking-item-details">
-                            <p>
-                                <strong>Route:</strong>
-                                JP Nagar
-                                <i class="fa-solid fa-arrow-right text-primary mx-1"></i>
-                                Forum Mall
-                            </p>
-                            <p>
-                                <strong>Schedule:</strong>
-                                11 Aug 2026 at 11:00 AM (3 hrs)
-                            </p>
-                        </div>
-
-                        <div class="assigned-companion-info">
-                            <h4>Assigned Companion</h4>
-                            <div class="comp-profile-row">
-                                <div class="comp-avatar-circle">
-                                    <i class="fa-solid fa-user-nurse"></i>
-                                </div>
-                                <div class="comp-details">
-                                    <h5>Rahul Sharma</h5>
-                                    <p>
-                                        <span><i class="fa-solid fa-star text-warning"></i> 4.8 Rating</span>
-                                        <span><i class="fa-solid fa-phone text-success ms-2"></i> +91 9876543210</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <p class="info-alert">
-                                <i class="fa-solid fa-circle-info"></i>
-                                Companion is setting up. Transit will begin shortly.
-                            </p>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <a href="tel:9876543210" class="btn btn-phone btn-sm">
-                                <i class="fa-solid fa-phone me-1"></i> Call Companion
-                            </a>
-                            <button class="btn btn-outline-danger btn-sm fw-semibold ms-auto">
-                                <i class="fa-solid fa-ban me-1"></i> Cancel Booking
-                            </button>
-                        </div>
-
-                    </div>
-
-
-                    <!-- ONGOING BOOKING & LIVE TRACKER -->
-                    <div class="active-booking-item status-ongoing">
-
-                        <div class="booking-item-header">
-                            <span class="service-tag">
-                                <i class="fa-solid fa-truck-medical"></i>
-                                Hospital Visit Transit
-                            </span>
-                            <span class="status-badge ongoing">
-                                Ongoing
-                            </span>
-                        </div>
-
-                        <div class="ongoing-tracker-card">
-
-                            <h4>
-                                <i class="fa-solid fa-location-dot text-success me-1"></i>
-                                Live Transit Tracking
-                            </h4>
-
-                            <div class="tracking-progress-steps">
-
-                                <div class="step active">
-                                    <div class="icon"><i class="fa-solid fa-check"></i></div>
-                                    <div class="text">Booked</div>
-                                </div>
-
-                                <div class="step active">
-                                    <div class="icon"><i class="fa-solid fa-user-check"></i></div>
-                                    <div class="text">Picked Up</div>
-                                </div>
-
-                                <div class="step active">
-                                    <div class="icon"><i class="fa-solid fa-person-walking"></i></div>
-                                    <div class="text">In Transit</div>
-                                </div>
-
-                                <div class="step">
-                                    <div class="icon"><i class="fa-solid fa-house-chimney"></i></div>
-                                    <div class="text">Return</div>
-                                </div>
-
-                            </div>
-
-                            <div class="companion-contact-mini">
-                                <span>
-                                    <strong>Active Companion:</strong> Rahul Sharma
-                                </span>
-                                <a href="tel:9876543210" class="btn-phone">
-                                    <i class="fa-solid fa-phone"></i> Call
-                                </a>
-                            </div>
-
-                            <div class="sos-container">
-                                <button class="btn btn-sos pulse-heavy" onclick="triggerEmergencySOS()">
-                                    <i class="fa-solid fa-triangle-exclamation"></i>
-                                    TRIGGER EMERGENCY SOS
-                                </button>
-                                <p class="sos-caption">
-                                    Clicking triggers immediate alert to family & emergency contact services.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div class="mt-3 text-end">
-                            <button class="btn btn-outline-primary btn-sm" onclick="openReviewModal('Rahul Sharma')">
-                                <i class="fa-solid fa-star me-1"></i> Rate Companion
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <!-- COMPLETED BOOKING FEEDBACK -->
-                    <div class="active-booking-item status-completed">
-
-                        <div class="booking-item-header">
-                            <span class="service-tag">
-                                <i class="fa-solid fa-circle-check"></i>
-                                Service Completed
-                            </span>
-                            <span class="status-badge completed">
-                                Completed
-                            </span>
-                        </div>
-
-                        <div class="completed-feedback-panel">
-                            <p>
-                                Your assistance has been completed. Please share your feedback so we can improve the service quality.
-                            </p>
-
-                            <div class="feedback-summary-row">
-                                <span><strong>Companion:</strong> Rahul Sharma</span>
-                                <span><strong>Visit:</strong> Apollo Hospital</span>
-                            </div>
-
-                            <button class="btn btn-primary btn-sm mt-2" onclick="openReviewModal('Rahul Sharma')">
-                                <i class="fa-solid fa-star me-1"></i>
-                                Leave Feedback
-                            </button>
-                        </div>
-
-                    </div>
-
+                <div class="active-bookings-list" id="activeBookingsList">
+                    <!-- Dynamic Active Request Card standard container -->
                 </div>
 
             </div>
 
+        </div>
+
+        <!-- ==================== RAPIDO-STYLE CLIENT BOOKING HISTORY ==================== -->
+        <div class="dashboard-card glass-card mt-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <div>
+                    <h3 class="mb-1">
+                        <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>
+                        Booking & Ride History
+                    </h3>
+                    <p class="text-muted small mb-0">View all past and present companion bookings with complete route and fare records.</p>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <label for="clientPeriodFilter" class="small fw-bold text-secondary me-1">
+                        <i class="fa-solid fa-filter text-primary me-1"></i> Period:
+                    </label>
+                    <select id="clientPeriodFilter" onchange="loadClientHistory()" class="form-select form-select-sm border fw-semibold cursor-pointer shadow-sm rounded-pill px-3" style="width: auto; min-width: 140px;">
+                        <option value="all" selected>All Time</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="this_week">This Week</option>
+                        <option value="this_month">This Month</option>
+                        <option value="last_month">Last Month</option>
+                        <option value="this_year">This Year</option>
+                        <option value="custom">Custom Range...</option>
+                    </select>
+
+                    <select id="clientStatusFilter" onchange="loadClientHistory()" class="form-select form-select-sm border fw-semibold cursor-pointer shadow-sm rounded-pill px-3" style="width: auto; min-width: 130px;">
+                        <option value="all" selected>All Statuses</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                        <option value="ACCEPTED">Accepted</option>
+                        <option value="IN_TRANSIT">In Transit</option>
+                    </select>
+
+                    <div id="clientCustomDateWrapper" class="align-items-center gap-1" style="display: none;">
+                        <input type="date" id="clientStartDate" class="form-control form-control-sm rounded-3" style="width: 130px;">
+                        <span class="small text-muted">to</span>
+                        <input type="date" id="clientEndDate" class="form-control form-control-sm rounded-3" style="width: 130px;">
+                        <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="loadClientHistory()">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Trip Summary Badges -->
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge bg-primary bg-opacity-10 text-primary p-2 px-3 rounded-pill border border-primary-subtle fw-bold">
+                    <i class="fa-solid fa-list-check me-1"></i> Total Rides: <strong id="clientTotalRidesCount">0</strong>
+                </span>
+                <span class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-pill border border-success-subtle fw-bold">
+                    <i class="fa-solid fa-circle-check me-1"></i> Completed: <strong id="clientCompletedRidesCount">0</strong>
+                </span>
+                <span class="badge bg-info bg-opacity-10 text-info p-2 px-3 rounded-pill border border-info-subtle fw-bold">
+                    <i class="fa-solid fa-indian-rupee-sign me-1"></i> Total Spent: <strong id="clientTotalSpentCount">₹ 0</strong>
+                </span>
+            </div>
+
+            <!-- Rapido Style History Trip Cards Container -->
+            <div id="clientHistoryCardsContainer" class="d-flex flex-column gap-3">
+                <!-- Dynamically populated via JS -->
+            </div>
         </div>
 
     </div>
@@ -439,11 +305,11 @@
             <form id="feedbackForm" onsubmit="submitClientFeedback(event)">
 
                 <p class="text-center text-muted">
-                    Please rate your experience with <strong id="modalCompanion" class="text-dark">Companion</strong>
+                    Please rate your experience with <strong id="modalCompanion" class="text-dark">Rahul Sharma</strong>
                 </p>
 
                 <div class="rating-stars-input">
-                    <input type="radio" id="star5" name="rating" value="5">
+                    <input type="radio" id="star5" name="rating" value="5" checked>
                     <label for="star5"><i class="fa-solid fa-star"></i></label>
 
                     <input type="radio" id="star4" name="rating" value="4">
@@ -460,11 +326,11 @@
                 </div>
 
                 <div class="form-group mt-3">
-                    <label><i class="fa-solid fa-comment-dots text-primary"></i> Feedback</label>
-                    <textarea id="feedbackComment" rows="3" placeholder="Share your experience with the companion..."></textarea>
+                    <label><i class="fa-solid fa-comment-dots text-primary"></i> Feedback Comments</label>
+                    <textarea id="feedbackComment" rows="3" class="form-control" placeholder="Share details about punctuality, care, and assistance..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-primary btn-block mt-3 fw-bold">
                     Submit Feedback
                 </button>
 
@@ -485,7 +351,7 @@
             <h3>EMERGENCY SOS ALERT TRIGGERED</h3>
 
             <p id="sos-message" class="text-secondary">
-                Contacting emergency services and broadcasting live location to family contact (<strong>9876543210</strong>)...
+                Contacting emergency services and broadcasting live location to family contact (<strong id="modalEmergencyContactDisplay">Loading...</strong>)...
             </p>
 
             <button class="btn btn-secondary mt-3 px-4 rounded-pill" onclick="closeSOSModal()">
@@ -496,29 +362,642 @@
     </div>
 
 
-    <!-- ==================== JAVASCRIPT ==================== -->
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
     <script>
+    let cancellationTimer = null;
+    let timeoutTimer = null;
+    let clientMapInstance = null;
+
+    // Helper to get active booking state
+    function getBookingState() {
+        const stored = localStorage.getItem('eldergo_active_booking');
+        if (stored) {
+            try { return JSON.parse(stored); } catch(e) {}
+        }
+        return null;
+    }
+
+    // Helper to save active booking state
+    function setBookingState(data) {
+        if (!data) {
+            localStorage.removeItem('eldergo_active_booking');
+        } else {
+            localStorage.setItem('eldergo_active_booking', JSON.stringify(data));
+        }
+        renderActiveBookingUI();
+    }
+
+    const bookingDateInput = document.getElementById("booking_date");
+    const bookingTimeInput = document.getElementById("booking_time");
+    const bookingDateTimeError = document.getElementById("bookingDateTimeError");
+
+    function getKolkataDateTimeParts() {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
+        }).formatToParts(new Date());
+        return Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+    }
+
+    function getKolkataDateString() {
+        const parts = getKolkataDateTimeParts();
+        return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function getKolkataTimeString() {
+        const parts = getKolkataDateTimeParts();
+        return `${parts.hour}:${parts.minute}`;
+    }
+
+    function isFutureBookingDateTime(dateValue, timeValue) {
+        if (!dateValue || !timeValue) return false;
+        const selected = new Date(`${dateValue}T${timeValue}:00+05:30`);
+        return !Number.isNaN(selected.getTime()) && selected.getTime() > Date.now();
+    }
+
+    function updateBookingDateTimeLimits() {
+        const today = getKolkataDateString();
+        bookingDateInput.min = today;
+        if (!bookingDateInput.value) bookingDateInput.value = today;
+        bookingTimeInput.min = bookingDateInput.value === today ? getKolkataTimeString() : '';
+        validateBookingDateTime();
+    }
+
+    function validateBookingDateTime() {
+        const isFuture = isFutureBookingDateTime(bookingDateInput.value, bookingTimeInput.value);
+        const message = isFuture ? '' : 'Please select a future date and time.';
+        bookingDateTimeError.textContent = message;
+        bookingTimeInput.setCustomValidity(message);
+        return isFuture;
+    }
+
+    bookingDateInput.addEventListener('change', updateBookingDateTimeLimits);
+    bookingTimeInput.addEventListener('input', validateBookingDateTime);
+    bookingTimeInput.addEventListener('change', validateBookingDateTime);
+    updateBookingDateTimeLimits();
+    setInterval(updateBookingDateTimeLimits, 60000);
+
+    // Form Submission: Create Booking
+    async function handleClientBookingSubmit(e) {
+        e.preventDefault();
+
+        const serviceType = document.getElementById("service_type").value;
+        const bookingDate = document.getElementById("booking_date").value;
+        const bookingTime = document.getElementById("booking_time").value;
+        const duration = parseInt(document.getElementById("booking_duration").value) || 2;
+        const pickup = document.getElementById("pickup_address").value.trim();
+        const destination = document.getElementById("destination_address").value.trim();
+        const notes = document.getElementById("health_notes").value.trim();
+
+        updateBookingDateTimeLimits();
+        if (!validateBookingDateTime()) {
+            bookingDateInput.reportValidity();
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/bookings/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    serviceType,
+                    date: bookingDate,
+                    time: bookingTime,
+                    duration,
+                    pickup,
+                    destination,
+                    notes
+                })
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success || !data.booking) {
+                alert(data.message || 'Unable to create booking. Please try again.');
+                return;
+            }
+
+            const booking = data.booking;
+            localStorage.removeItem('eldergo_closed_booking_id');
+            const newBooking = {
+                ...booking,
+                serviceType: booking.service_type,
+                date: booking.booking_date,
+                time: booking.booking_time,
+                duration: booking.duration_hours,
+                pickup: booking.pickup_address,
+                destination: booking.destination_address,
+                notes: booking.health_notes,
+                clientName: booking.clientName,
+                clientPhone: booking.clientPhone,
+                otp: data.otp,
+                cancellationRemaining: 30,
+                timeoutRemaining: 300,
+                companion: {
+                    name: 'Rahul Sharma',
+                    phone: '+91 9876543210',
+                    rating: '4.9',
+                    hourlyRate: booking.hourly_rate || 250
+                },
+                paymentStatus: booking.payment_status,
+                createdAt: Date.now()
+            };
+
+            setBookingState(newBooking);
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            alert('Unable to create booking. Please check your connection and try again.');
+        }
+    }
+
+    // Render Active Booking UI depending on state
+    function renderActiveBookingUI() {
+        const container = document.getElementById('activeBookingsList');
+        if (!container) return;
+
+        const booking = getBookingState();
+
+        if (!booking) {
+            container.innerHTML = `
+                <div class="p-4 text-center bg-light rounded-3 border">
+                    <i class="fa-solid fa-calendar-xmark text-muted fs-1 mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">No Active Requests</h5>
+                    <p class="text-secondary small mb-0">Fill in your destination and pickup location on the left to request a verified companion.</p>
+                </div>
+            `;
+            stopTimers();
+            return;
+        }
+
+        // Clear old timers on re-render
+        stopTimers();
+
+        if (booking.status === 'SEARCHING') {
+            container.innerHTML = `
+                <div class="active-booking-item status-pending border-start border-4 border-primary">
+                    <div class="booking-item-header">
+                        <span class="service-tag">
+                            <i class="fa-solid fa-hand-holding-hand me-1"></i> ${booking.serviceType}
+                        </span>
+                        <span class="status-badge pending">Finding Companion...</span>
+                    </div>
+
+                    <div class="finding-companion-radar">
+                        <div class="radar-circle"></div>
+                        <div class="radar-circle"></div>
+                        <div class="radar-center-icon">
+                            <i class="fa-solid fa-magnifying-glass fa-pulse"></i>
+                        </div>
+                    </div>
+
+                    <div class="booking-item-details text-center">
+                        <h5 class="fw-bold text-dark mb-1">Connecting with Nearby Companions</h5>
+                        <p class="mb-1">
+                            <strong>Route:</strong> ${booking.pickup} <i class="fa-solid fa-arrow-right text-primary mx-1"></i> ${booking.destination}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Schedule:</strong> ${booking.date} at ${booking.time} (${booking.duration} hrs)
+                        </p>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-2 bg-light rounded-3 border mb-3">
+                        <span class="timer-badge cancellation" id="cancellationBadge">
+                            <i class="fa-solid fa-stopwatch"></i> Cancel window: <span id="cancelSecText">${booking.cancellationRemaining}s</span>
+                        </span>
+                        <span class="timer-badge timeout">
+                            <i class="fa-solid fa-hourglass-half"></i> Timeout in: <span id="timeoutText">${formatTime(booking.timeoutRemaining)}</span>
+                        </span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button id="cancelBookingBtn" class="btn btn-outline-danger btn-sm fw-semibold px-3 rounded-pill" onclick="cancelCurrentBooking()">
+                            <i class="fa-solid fa-ban me-1"></i> Cancel Request
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            startSearchTimers();
+        } 
+        else if (booking.status === 'TIMED_OUT') {
+            container.innerHTML = `
+                <div class="active-booking-item status-pending border-start border-4 border-warning">
+                    <div class="booking-item-header">
+                        <span class="service-tag text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Connection Timeout</span>
+                        <span class="badge bg-warning text-dark fw-bold">Unassigned</span>
+                    </div>
+
+                    <div class="p-4 text-center">
+                        <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-3 d-inline-flex mb-3">
+                            <i class="fa-solid fa-user-slash fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark">Couldn't Find a Companion</h4>
+                        <p class="text-secondary small mb-3">
+                            All verified companions in your area are currently busy or unavailable. You can request again now or adjust your pickup schedule.
+                        </p>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-primary py-2 fw-bold rounded-3" onclick="requestAgain()">
+                                <i class="fa-solid fa-rotate-right me-2"></i> Request Again
+                            </button>
+                            <button class="btn btn-outline-danger py-2 fw-bold rounded-3" onclick="cancelAfterTimeout()">
+                                <i class="fa-solid fa-ban me-2"></i> Cancel Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        else if (booking.status === 'ACCEPTED') {
+            const hourlyRate = booking.companion.hourlyRate || 250;
+
+            container.innerHTML = `
+                <div class="active-booking-item status-accepted border-start border-4 border-success">
+                    <div class="booking-item-header">
+                        <span class="service-tag"><i class="fa-solid fa-circle-check text-success"></i> ${booking.serviceType}</span>
+                        <span class="status-badge accepted">Companion Assigned</span>
+                    </div>
+
+                    <div class="assigned-companion-info mt-2">
+                        <h4>Assigned Companion</h4>
+                        <div class="comp-profile-row align-items-center">
+                            <div class="comp-avatar-circle">
+                                <i class="fa-solid fa-user-nurse"></i>
+                            </div>
+                            <div class="comp-details flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 fw-bold">${booking.companion.name}</h5>
+                                    <span class="hourly-price-badge">₹${hourlyRate}/hour</span>
+                                </div>
+                                <p class="mb-0 mt-1">
+                                    <span><i class="fa-solid fa-star text-warning"></i> ${booking.companion.rating} Rating</span>
+                                    <span><i class="fa-solid fa-phone text-success ms-2"></i> ${booking.companion.phone}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OTP Section for starting ride -->
+                    <div class="otp-display-box">
+                        <span class="badge bg-primary text-white mb-1"><i class="fa-solid fa-key me-1"></i> RIDE START OTP</span>
+                        <p class="small text-secondary mb-1 fw-bold">Share this 4-digit OTP with your companion when they arrive:</p>
+                        <div class="otp-number">${booking.otp}</div>
+                    </div>
+
+                    <!-- Live Map Section -->
+                    <div class="mt-3">
+                        <h6 class="fw-bold small text-uppercase text-secondary mb-2"><i class="fa-solid fa-map-location-dot text-primary me-1"></i> Live Location Map</h6>
+                        <div id="clientLiveMap" class="dashboard-map-container"></div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="tel:${booking.companion.phone}" class="btn btn-phone btn-sm rounded-pill px-3">
+                            <i class="fa-solid fa-phone me-1"></i> Call Companion
+                        </a>
+                        <button class="btn btn-outline-danger btn-sm fw-semibold ms-auto rounded-pill px-3" onclick="cancelCurrentBooking()">
+                            <i class="fa-solid fa-ban me-1"></i> Cancel Booking
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                initClientLeafletMap(booking.pickup, booking.destination);
+            }, 100);
+        }
+        else if (booking.status === 'IN_TRANSIT') {
+            container.innerHTML = `
+                <div class="active-booking-item status-ongoing border-start border-4 border-warning">
+                    <div class="booking-item-header">
+                        <span class="service-tag"><i class="fa-solid fa-person-walking text-warning"></i> Transit In Progress</span>
+                        <span class="status-badge ongoing">In Transit</span>
+                    </div>
+
+                    <div class="ongoing-tracker-card mt-2">
+                        <h4><i class="fa-solid fa-location-dot text-success me-1"></i> Live Transit Tracking</h4>
+
+                        <div class="tracking-progress-steps">
+                            <div class="step active">
+                                <div class="icon"><i class="fa-solid fa-check"></i></div>
+                                <div class="text">Booked</div>
+                            </div>
+                            <div class="step active">
+                                <div class="icon"><div class="icon"><i class="fa-solid fa-key"></i></div></div>
+                                <div class="text">OTP Verified</div>
+                            </div>
+                            <div class="step active">
+                                <div class="icon"><i class="fa-solid fa-person-walking"></i></div>
+                                <div class="text">In Transit</div>
+                            </div>
+                            <div class="step">
+                                <div class="icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                                <div class="text">Complete</div>
+                            </div>
+                        </div>
+
+                        <!-- Live Map -->
+                        <div id="clientLiveMap" class="dashboard-map-container my-3"></div>
+
+                        <div class="companion-contact-mini">
+                            <span><strong>Active Companion:</strong> ${booking.companion.name}</span>
+                            <a href="tel:${booking.companion.phone}" class="btn-phone"><i class="fa-solid fa-phone"></i> Call</a>
+                        </div>
+
+                        <div class="sos-container mt-3">
+                            <button class="btn btn-sos pulse-heavy" onclick="triggerEmergencySOS()">
+                                <i class="fa-solid fa-triangle-exclamation"></i> TRIGGER EMERGENCY SOS
+                            </button>
+                            <p class="sos-caption">Clicking triggers immediate alert to family & emergency contact services.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                initClientLeafletMap(booking.pickup, booking.destination, true);
+            }, 100);
+        }
+        else if (booking.status === 'COMPLETED') {
+            const hourlyRate = booking.companion.hourlyRate || 250;
+            const hours = booking.duration || 2;
+            const subtotal = hourlyRate * hours;
+            const platformFee = 50;
+            const totalFare = subtotal + platformFee;
+
+            container.innerHTML = `
+                <div class="active-booking-item status-completed border-start border-4 border-success">
+                    <div class="booking-item-header">
+                        <span class="service-tag"><i class="fa-solid fa-circle-check text-success"></i> Assistance Completed</span>
+                        <span class="status-badge completed">Completed</span>
+                    </div>
+
+                    <div class="completed-feedback-panel mt-2">
+                        <h5 class="fw-bold text-dark"><i class="fa-solid fa-receipt text-primary me-2"></i> Ride & Payment Summary</h5>
+
+                        <!-- Fare Breakdown Card -->
+                        <div class="fare-breakdown-card my-3">
+                            <div class="fare-row">
+                                <span>Companion Hourly Rate (₹${hourlyRate} × ${hours} hrs)</span>
+                                <strong>₹${subtotal}</strong>
+                            </div>
+                            <div class="fare-row">
+                                <span>Platform Booking & Safety Fee</span>
+                                <strong>₹${platformFee}</strong>
+                            </div>
+                            <div class="fare-row total">
+                                <span>Total Fare Amount</span>
+                                <span class="text-success">₹${totalFare}</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Select Payment Method:</label>
+                            <select class="form-select form-select-sm" id="clientPaymentChoice">
+                                <option value="upi">UPI (Google Pay / PhonePe / Paytm)</option>
+                                <option value="wallet">ElderGo Wallet Balance</option>
+                                <option value="cash">Cash Paid directly to Companion</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3 border mb-3">
+                            <span class="small">Payment Status:</span>
+                            <span class="badge ${booking.paymentStatus === 'PAID' ? 'bg-success' : 'bg-warning text-dark'} fw-bold px-3 py-2" id="paymentStatusBadge">
+                                ${booking.paymentStatus === 'PAID' ? '✓ Paid' : 'Payment Due'}
+                            </span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm rounded-pill px-3 fw-bold" onclick="markAsPaid()">
+                                <i class="fa-solid fa-credit-card me-1"></i> Pay Now (₹${totalFare})
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3 ms-auto" onclick="openReviewModal('${booking.companion.name}')">
+                                <i class="fa-solid fa-star me-1"></i> Leave Feedback
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Search Timers (30s Cancellation Countdown & 5min Timeout)
+    function startSearchTimers() {
+        stopTimers();
+
+        cancellationTimer = setInterval(() => {
+            const booking = getBookingState();
+            if (!booking || booking.status !== 'SEARCHING') {
+                clearInterval(cancellationTimer);
+                return;
+            }
+
+            booking.cancellationRemaining = Number.isFinite(Number(booking.cancellationRemaining)) ? Number(booking.cancellationRemaining) : 30;
+            booking.timeoutRemaining = Number.isFinite(Number(booking.timeoutRemaining)) ? Number(booking.timeoutRemaining) : 300;
+
+            if (booking.cancellationRemaining > 0) {
+                booking.cancellationRemaining -= 1;
+                localStorage.setItem('eldergo_active_booking', JSON.stringify(booking));
+
+                const cancelTxt = document.getElementById('cancelSecText');
+                if (cancelTxt) cancelTxt.innerText = booking.cancellationRemaining + 's';
+
+                if (booking.cancellationRemaining <= 0) {
+                    const cancelBtn = document.getElementById('cancelBookingBtn');
+                    const badge = document.getElementById('cancellationBadge');
+                    if (cancelBtn) {
+                        cancelBtn.disabled = true;
+                        cancelBtn.innerHTML = '<i class="fa-solid fa-lock me-1"></i> Cancellation Locked';
+                        cancelBtn.className = 'btn btn-secondary btn-sm fw-semibold px-3 rounded-pill';
+                    }
+                    if (badge) {
+                        badge.innerHTML = '<i class="fa-solid fa-lock"></i> Cancellation Locked';
+                    }
+                }
+            }
+        }, 1000);
+
+        timeoutTimer = setInterval(() => {
+            const booking = getBookingState();
+            if (!booking || booking.status !== 'SEARCHING') {
+                clearInterval(timeoutTimer);
+                return;
+            }
+
+            if (booking.timeoutRemaining > 0) {
+                booking.timeoutRemaining -= 1;
+                localStorage.setItem('eldergo_active_booking', JSON.stringify(booking));
+
+                const timeoutTxt = document.getElementById('timeoutText');
+                if (timeoutTxt) timeoutTxt.innerText = formatTime(booking.timeoutRemaining);
+
+                if (booking.timeoutRemaining <= 0) {
+                    triggerTimeoutState();
+                }
+            }
+        }, 1000);
+    }
+
+    function stopTimers() {
+        if (cancellationTimer) clearInterval(cancellationTimer);
+        if (timeoutTimer) clearInterval(timeoutTimer);
+    }
+
+    function formatTime(seconds) {
+        seconds = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function cancelCurrentBooking() {
+        const booking = getBookingState();
+        if (!booking || !confirm("Are you sure you want to cancel this request?")) return;
+
+        fetch(`/api/bookings/${booking.id}/cancel`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.message || 'This booking cannot be cancelled now.');
+                    return;
+                }
+                setBookingState(null);
+                loadClientHistory();
+                alert("Booking request cancelled.");
+            })
+            .catch(err => console.error('Error cancelling booking:', err));
+    }
+
+    function cancelTimedOutBooking() {
+        cancelCurrentBooking();
+    }
+
+    function markBookingTimedOut(booking) {
+        fetch(`/api/bookings/${booking.id}/timeout`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    booking.status = 'TIMED_OUT';
+                    setBookingState(booking);
+                    loadClientHistory();
+                }
+            })
+            .catch(err => console.error('Error timing out booking:', err));
+    }
+
+    function clearBookingForNewRequest() {
+        const booking = getBookingState();
+        if (booking && booking.id) {
+            localStorage.setItem('eldergo_closed_booking_id', String(booking.id));
+        }
+        setBookingState(null);
+        document.getElementById('pickup_address').focus();
+        loadClientHistory();
+    }
+
+    function requestAgain() {
+        clearBookingForNewRequest();
+    }
+
+    function cancelAfterTimeout() {
+        cancelTimedOutBooking();
+    }
+
+    function triggerTimeoutState() {
+        const booking = getBookingState();
+        if (booking && booking.status === 'SEARCHING') {
+            markBookingTimedOut(booking);
+        }
+    }
+
+    function simulateCompanionAccept() {
+        const booking = getBookingState();
+        if (booking) {
+            booking.status = 'ACCEPTED';
+            setBookingState(booking);
+        }
+    }
+
+    function markAsPaid() {
+        const booking = getBookingState();
+        if (booking) {
+            booking.paymentStatus = 'PAID';
+            setBookingState(booking);
+            alert("Payment processed successfully! Thank you.");
+        }
+    }
+
+    // Leaflet Live Map Integration
+    function initClientLeafletMap(pickupAddr, destAddr, isInTransit = false) {
+        const mapContainer = document.getElementById('clientLiveMap');
+        if (!mapContainer) return;
+
+        // Reset existing instance
+        if (clientMapInstance) {
+            clientMapInstance.remove();
+            clientMapInstance = null;
+        }
+
+        // Coordinates centered on Bangalore (JP Nagar -> Apollo Hospital Rd)
+        const pickupCoords = [12.9069, 77.5857];
+        const destCoords = [12.9166, 77.6001];
+        const companionCoords = isInTransit ? [12.9110, 77.5920] : [12.9045, 77.5810];
+
+        clientMapInstance = L.map('clientLiveMap').setView(pickupCoords, 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(clientMapInstance);
+
+        // Markers
+        const pickupMarker = L.marker(pickupCoords).addTo(clientMapInstance)
+            .bindPopup(`<b>Pickup:</b> ${pickupAddr}`).openPopup();
+
+        const destMarker = L.marker(destCoords).addTo(clientMapInstance)
+            .bindPopup(`<b>Destination:</b> ${destAddr}`);
+
+        const compMarker = L.marker(companionCoords).addTo(clientMapInstance)
+            .bindPopup(`<b>Companion Rahul Sharma</b><br>${isInTransit ? 'En Route to Destination' : 'Approaching Pickup'}`);
+
+        // Draw Polyline Route
+        const routeLine = L.polyline([pickupCoords, companionCoords, destCoords], {
+            color: '#4f46e5',
+            weight: 4,
+            dashArray: '8, 8'
+        }).addTo(clientMapInstance);
+
+        clientMapInstance.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+    }
+
+    // Review Modal Functions
     function openReviewModal(name) {
         document.getElementById("modalCompanion").innerText = name;
         document.getElementById("reviewModal").style.display = "block";
     }
 
+    function closeReviewModal() {
+        document.getElementById("reviewModal").style.display = "none";
+    }
+
     function submitClientFeedback(event) {
         event.preventDefault();
-
         const selectedRating = document.querySelector('input[name="rating"]:checked');
         const feedbackText = document.getElementById('feedbackComment').value.trim();
         const companionName = document.getElementById('modalCompanion').innerText || 'Rahul Sharma';
 
         if (!selectedRating) {
-            alert('Please select a star rating before submitting.');
+            alert('Please select a star rating.');
             return;
         }
 
         const review = {
             companion: companionName,
             rating: Number(selectedRating.value),
-            comment: feedbackText || 'Very helpful and professional service.',
+            comment: feedbackText || 'Excellent, patient and supportive companion.',
             createdAt: new Date().toISOString()
         };
 
@@ -531,12 +1010,30 @@
         alert('Thank you for your feedback!');
     }
 
-    function closeReviewModal() {
-        document.getElementById("reviewModal").style.display = "none";
-    }
-
     function triggerEmergencySOS() {
-        document.getElementById("sosAlertModal").style.display = "block";
+        const modal = document.getElementById("sosAlertModal");
+        const messageBox = document.getElementById("sos-message");
+
+        modal.style.display = "block";
+        messageBox.innerHTML = "Sending emergency alert to your saved contact...";
+
+        fetch('/api/emergency/sos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const provider = data.simulated ? 'demo/local test mode' : 'real SMS gateway';
+                messageBox.innerHTML = `Emergency alert sent to <strong>${data.phone}</strong> via ${provider}.`;
+            } else {
+                messageBox.innerHTML = data.message || 'Unable to send emergency alert.';
+            }
+        })
+        .catch(() => {
+            messageBox.innerHTML = 'Emergency service is unavailable right now. Please try again.';
+        });
     }
 
     function closeSOSModal() {
@@ -544,28 +1041,226 @@
     }
 
     window.onclick = function(e) {
-        if (e.target == document.getElementById("reviewModal")) {
-            closeReviewModal();
-        }
-        if (e.target == document.getElementById("sosAlertModal")) {
-            closeSOSModal();
-        }
+        if (e.target == document.getElementById("reviewModal")) closeReviewModal();
+        if (e.target == document.getElementById("sosAlertModal")) closeSOSModal();
     }
 
-    // Default booking date to today
-    document.getElementById("booking_date").valueAsDate = new Date();
+    function loadClientHistory() {
+        const periodSelect = document.getElementById('clientPeriodFilter');
+        const statusSelect = document.getElementById('clientStatusFilter');
+        const period = periodSelect ? periodSelect.value : 'all';
+        const status = statusSelect ? statusSelect.value : 'all';
+        const customWrapper = document.getElementById('clientCustomDateWrapper');
+
+        if (periodSelect && period === 'custom') {
+            if (customWrapper) customWrapper.style.display = 'inline-flex';
+        } else {
+            if (customWrapper) customWrapper.style.display = 'none';
+        }
+
+        const startDate = document.getElementById('clientStartDate') ? document.getElementById('clientStartDate').value : '';
+        const endDate = document.getElementById('clientEndDate') ? document.getElementById('clientEndDate').value : '';
+
+        let url = `/api/client/history?period=${encodeURIComponent(period)}&status=${encodeURIComponent(status)}`;
+        if (period === 'custom') {
+            url += `&start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
+        }
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const totalRidesEl = document.getElementById('clientTotalRidesCount');
+                    const completedRidesEl = document.getElementById('clientCompletedRidesCount');
+                    const totalSpentEl = document.getElementById('clientTotalSpentCount');
+                    if (totalRidesEl) totalRidesEl.textContent = data.summary.total_bookings || 0;
+                    if (completedRidesEl) completedRidesEl.textContent = data.summary.completed_bookings || 0;
+                    if (totalSpentEl) totalSpentEl.textContent = '₹ ' + Number(data.summary.total_spent || 0).toLocaleString('en-IN');
+
+                    renderClientHistoryCards(data.history || []);
+                }
+            })
+            .catch(err => console.error("Error loading client history:", err));
+    }
+
+    function syncClientBookingFromServer() {
+        fetch('/api/bookings/client/active')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success || !data.hasBooking || !data.booking) return;
+
+                const serverBooking = data.booking;
+                const currentBooking = getBookingState() || {};
+                const closedBookingId = localStorage.getItem('eldergo_closed_booking_id');
+                if (!currentBooking.id && closedBookingId === String(serverBooking.id)) return;
+                const booking = {
+                    ...currentBooking,
+                    ...serverBooking,
+                    serviceType: serverBooking.service_type,
+                    date: serverBooking.booking_date,
+                    time: serverBooking.booking_time,
+                    duration: serverBooking.duration_hours,
+                    pickup: serverBooking.pickup_address,
+                    destination: serverBooking.destination_address,
+                    notes: serverBooking.health_notes,
+                    clientName: serverBooking.clientName,
+                    clientPhone: serverBooking.clientPhone,
+                    cancellationRemaining: Number.isFinite(Number(currentBooking.cancellationRemaining)) ? currentBooking.cancellationRemaining : 30,
+                    timeoutRemaining: Number.isFinite(Number(currentBooking.timeoutRemaining)) ? currentBooking.timeoutRemaining : 300,
+                    paymentStatus: serverBooking.payment_status,
+                    companion: {
+                        ...(currentBooking.companion || {}),
+                        name: serverBooking.companionName || (currentBooking.companion || {}).name,
+                        phone: serverBooking.companionPhone || (currentBooking.companion || {}).phone
+                    }
+                };
+                localStorage.setItem('eldergo_active_booking', JSON.stringify(booking));
+                renderActiveBookingUI();
+                loadClientHistory();
+            })
+            .catch(err => console.error('Error syncing client booking:', err));
+    }
+
+    function renderClientHistoryCards(trips) {
+        const container = document.getElementById('clientHistoryCardsContainer');
+        if (!container) return;
+
+        if (!trips || trips.length === 0) {
+            container.innerHTML = `
+                <div class="p-4 text-center bg-light rounded-3 border">
+                    <i class="fa-solid fa-route text-muted fs-2 mb-2 d-block"></i>
+                    <h6 class="fw-bold text-dark mb-1">No Past Bookings Found</h6>
+                    <p class="text-secondary small mb-0">Bookings you make will appear here with full companion and route history records.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = trips.map(trip => {
+            const dateStr = trip.completed_at ?
+                new Date(trip.completed_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) :
+                (trip.created_at ? new Date(trip.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : `${trip.booking_date} at ${trip.booking_time}`);
+
+            let statusBadge = '<span class="badge bg-primary rounded-pill px-3">Searching</span>';
+            if (trip.status === 'COMPLETED') {
+                statusBadge = '<span class="badge bg-success rounded-pill px-3"><i class="fa-solid fa-circle-check me-1"></i> Completed</span>';
+            } else if (trip.status === 'CANCELLED') {
+                statusBadge = '<span class="badge bg-danger rounded-pill px-3"><i class="fa-solid fa-ban me-1"></i> Cancelled</span>';
+            } else if (trip.status === 'IN_TRANSIT') {
+                statusBadge = '<span class="badge bg-warning text-dark rounded-pill px-3"><i class="fa-solid fa-person-walking me-1"></i> In Transit</span>';
+            } else if (trip.status === 'ACCEPTED') {
+                statusBadge = '<span class="badge bg-info text-dark rounded-pill px-3"><i class="fa-solid fa-user-check me-1"></i> Assigned</span>';
+            }
+
+            const companionInfo = trip.companionName ?
+                `<strong><i class="fa-solid fa-user-nurse text-primary me-1"></i> ${trip.companionName}</strong> <small class="text-muted">(${trip.companionPhone || ''})</small>` :
+                `<span class="text-muted fst-italic">Finding companion...</span>`;
+
+            return `
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-shadow transition-all">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 rounded-pill">
+                                <i class="fa-solid fa-ticket me-1"></i> ${trip.booking_code}
+                            </span>
+                            <span class="fw-bold text-dark">${trip.service_type}</span>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-7">
+                            <div class="d-flex flex-column gap-1">
+                                <div class="small">
+                                    <i class="fa-solid fa-location-dot text-success me-2"></i>
+                                    <strong>Pickup:</strong> ${trip.pickup_address}
+                                </div>
+                                <div class="small">
+                                    <i class="fa-solid fa-location-crosshairs text-danger me-2"></i>
+                                    <strong>Destination:</strong> ${trip.destination_address}
+                                </div>
+                                <div class="extra-small text-muted mt-1">
+                                    <i class="fa-solid fa-calendar-days me-1"></i> Date & Time: ${dateStr}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 text-md-end border-md-start">
+                            <div class="small mb-1">
+                                Companion: ${companionInfo}
+                            </div>
+                            <div class="fs-5 fw-bold text-success mb-1">
+                                ₹${trip.total_fare || 550}
+                            </div>
+                            ${trip.status === 'COMPLETED' ? `
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-3 mt-1" onclick="openReviewModal('${trip.companionName || 'Companion'}')">
+                                    <i class="fa-solid fa-star text-warning me-1"></i> Rate Service
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Sync state changes across tabs in real-time
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'eldergo_active_booking') {
+            renderActiveBookingUI();
+            loadClientHistory();
+        }
+    });
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', () => {
+        renderActiveBookingUI();
+        loadClientHistory();
+        syncClientBookingFromServer();
+        setInterval(syncClientBookingFromServer, 5000);
+        
+        const savedUserName = localStorage.getItem('eldergo_username') || 'Client';
+        const welcomeName = document.getElementById('welcomeUserName');
+        if (welcomeName) welcomeName.textContent = savedUserName;
+
+        // Fetch logged in user profile to display saved Emergency Contact number
+        fetch('/api/me')
+            .then(res => res.json())
+            .then(data => {
+                if (data.authenticated && data.user) {
+                    if (welcomeName && data.user.full_name) {
+                        welcomeName.textContent = data.user.full_name;
+                    }
+                    const genderAgeDisplay = document.getElementById('userGenderAgeDisplay');
+                    if (genderAgeDisplay) {
+                        const genderStr = data.user.gender || 'Client';
+                        const ageStr = data.user.age ? `(Age ${data.user.age})` : '';
+                        genderAgeDisplay.textContent = `${genderStr} ${ageStr}`.trim();
+                    }
+                    const contactNum = data.user.emergency_contact || '9876543210';
+                    const pillDisplay = document.getElementById('userEmergencyContactDisplay');
+                    const modalDisplay = document.getElementById('modalEmergencyContactDisplay');
+                    if (pillDisplay) pillDisplay.textContent = contactNum;
+                    if (modalDisplay) modalDisplay.textContent = contactNum;
+                } else {
+                    const pillDisplay = document.getElementById('userEmergencyContactDisplay');
+                    const modalDisplay = document.getElementById('modalEmergencyContactDisplay');
+                    if (pillDisplay) pillDisplay.textContent = '9876543210';
+                    if (modalDisplay) modalDisplay.textContent = '9876543210';
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching user profile:", err);
+                const pillDisplay = document.getElementById('userEmergencyContactDisplay');
+                const modalDisplay = document.getElementById('modalEmergencyContactDisplay');
+                if (pillDisplay) pillDisplay.textContent = '9876543210';
+                if (modalDisplay) modalDisplay.textContent = '9876543210';
+            });
+    });
     </script>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const savedUserName = localStorage.getItem('eldergo_username') || 'Client';
-        const welcomeName = document.getElementById('welcomeUserName');
-
-        if (welcomeName) {
-            welcomeName.textContent = savedUserName;
-        }
-    </script>
 
     <!-- Authentication Helper -->
     <script src="../static/js/auth.js"></script>

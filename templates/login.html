@@ -72,14 +72,14 @@
 
                 <label for="username">
                     <i class="fa-solid fa-user"></i>
-                    Username
+                    Username / Mobile / Email
                 </label>
 
                 <input
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="Enter your username"
+                    placeholder="Enter username, email, or mobile"
                     required
                 >
 
@@ -89,10 +89,15 @@
             <!-- Password -->
             <div class="form-group">
 
-                <label for="password">
-                    <i class="fa-solid fa-key"></i>
-                    Password
-                </label>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="password" class="mb-0">
+                        <i class="fa-solid fa-key"></i>
+                        Password
+                    </label>
+                    <a href="#" class="small text-decoration-none text-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                        Forgot Password?
+                    </a>
+                </div>
 
                 <input
                     type="password"
@@ -122,16 +127,10 @@
 
             <p>
                 Don't have an account?
-                <a href="register.html">
+                <a href="/register">
                     Register here
                 </a>
             </p>
-
-        </div>
-
-
-
-            </div>
 
         </div>
 
@@ -139,30 +138,226 @@
 
 </div>
 
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card p-3 border-0 shadow-lg" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px;">
 
-<!-- Demo Login JavaScript -->
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary" id="forgotPasswordModalLabel">
+                    <i class="fa-solid fa-shield-halved me-2"></i>Reset Your Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-muted small mb-3">
+                    Enter your registered <strong>Mobile Number</strong> or <strong>Email ID</strong> to recover your account.
+                </p>
+
+                <!-- Step 1: Identifier Input Form -->
+                <form id="forgotVerifyForm">
+                    <div class="mb-3">
+                        <label for="resetIdentifier" class="form-label small fw-bold text-dark">
+                            <i class="fa-solid fa-user-gear text-primary me-1"></i> Email ID or Mobile Number
+                        </label>
+                        <input type="text" id="resetIdentifier" class="form-control py-2" placeholder="e.g. rahul.sharma@eldergo.com or 9845012345" required>
+                    </div>
+                    <button type="submit" id="btnVerifyIdentifier" class="btn btn-primary w-100 py-2 fw-bold">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Verify & Get Reset OTP
+                    </button>
+                </form>
+
+                <!-- Step 2: OTP & New Password Form (Initially hidden) -->
+                <form id="forgotResetForm" style="display: none;" class="mt-3">
+                    <div class="alert alert-success py-2 small mb-3" id="resetUserFoundMsg">
+                        Account verified! Enter OTP and set a new password.
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="resetOtp" class="form-label small fw-bold text-dark">
+                            <i class="fa-solid fa-key text-warning me-1"></i> Verification OTP Code
+                        </label>
+                        <input type="text" id="resetOtp" class="form-control text-center font-monospace fw-bold fs-5 py-1" maxlength="4" placeholder="Enter 4-Digit OTP" required>
+                        <small class="text-muted extra-small d-block mt-1" id="otpHintText">Default OTP: <strong>1234</strong></small>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="newPassword" class="form-label small fw-bold text-dark">
+                            <i class="fa-solid fa-lock text-primary me-1"></i> New Password
+                        </label>
+                        <input type="password" id="newPassword" class="form-control py-2" placeholder="Enter your new password" required minlength="4">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label small fw-bold text-dark">
+                            <i class="fa-solid fa-check-double text-success me-1"></i> Confirm New Password
+                        </label>
+                        <input type="password" id="confirmNewPassword" class="form-control py-2" placeholder="Re-enter new password" required minlength="4">
+                    </div>
+
+                    <div id="resetFeedback" class="small mb-2"></div>
+
+                    <button type="submit" id="btnSubmitNewPassword" class="btn btn-success w-100 py-2 fw-bold">
+                        <i class="fa-solid fa-circle-check me-1"></i> Reset Password & Log In
+                    </button>
+                </form>
+
+                <!-- Live SMS & Email Notification Push Banner -->
+                <div id="mobileSmsBanner" class="alert alert-dark border-start border-4 border-warning shadow-sm mt-3" style="display:none; background:#0f172a; color:#fff; border-radius:12px;">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="badge bg-warning text-dark me-2 px-2 py-1"><i class="fa-solid fa-mobile-screen-button me-1"></i> SMS / Email Security Alert</span>
+                        <small class="text-white-50 ms-auto">Just now</small>
+                    </div>
+                    <div id="mobileSmsBannerText" class="small font-monospace text-light"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Real Login JavaScript -->
 <script>
-    const demoAccounts = {
-        admin: { password: 'admin123', redirect: 'admin_dasboard.html' },
-        client: { password: 'client123', redirect: 'client_dashboard.html' },
-        companion: { password: 'companion123', redirect: 'companion_dasboard.html' }
-    };
-
     document.getElementById('loginForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
-        const account = demoAccounts[username];
 
-        if (account && account.password === password) {
-            localStorage.setItem('eldergo_username', username);
-            localStorage.setItem('eldergo_role', username);
-            window.location.href = account.redirect;
-        } else {
-            alert('Invalid username or password.');
-        }
+        fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('eldergo_username', data.user.username);
+                localStorage.setItem('eldergo_role', data.user.role);
+                window.location.href = '/' + data.redirect.replace(/^\//, '');
+            } else {
+                alert(data.message || 'Invalid username or password.');
+            }
+        })
+        .catch(err => {
+            alert('Error connecting to backend server: ' + err);
+        });
     });
+
+    // Forgot Password JavaScript Handlers
+    let verifiedIdentifier = '';
+
+    const verifyForm = document.getElementById('forgotVerifyForm');
+    if (verifyForm) {
+        verifyForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const identifier = document.getElementById('resetIdentifier').value.trim();
+            if (!identifier) return;
+
+            const btn = document.getElementById('btnVerifyIdentifier');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Verifying...';
+
+            fetch('/api/forgot-password/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Verify & Get Reset OTP';
+
+                if (data.success) {
+                    verifiedIdentifier = identifier;
+                    document.getElementById('resetUserFoundMsg').innerHTML = 
+                        `<i class="fa-solid fa-circle-check me-1 text-success"></i> Account found for <strong>${data.user.fullName}</strong>. Verification message dispatched!`;
+                    document.getElementById('otpHintText').innerHTML = 
+                        `OTP sent to mobile/email: <strong class="text-primary fs-6">${data.otp_hint || '1234'}</strong>`;
+                    document.getElementById('resetOtp').value = data.otp_hint || '1234';
+
+                    const banner = document.getElementById('mobileSmsBanner');
+                    const bannerText = document.getElementById('mobileSmsBannerText');
+                    if (banner && bannerText && data.sms_alert) {
+                        bannerText.innerText = "📩 " + data.sms_alert;
+                        banner.style.display = "block";
+                    }
+
+                    document.getElementById('forgotVerifyForm').style.display = 'none';
+                    document.getElementById('forgotResetForm').style.display = 'block';
+                } else {
+                    alert(data.message || 'No registered user account found with that Email or Mobile number.');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Verify & Get Reset OTP';
+                alert('Server error verifying user: ' + err);
+            });
+        });
+    }
+
+    const resetForm = document.getElementById('forgotResetForm');
+    if (resetForm) {
+        resetForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const otp = document.getElementById('resetOtp').value.trim();
+            const pwd = document.getElementById('newPassword').value.trim();
+            const confirmPwd = document.getElementById('confirmNewPassword').value.trim();
+            const feedback = document.getElementById('resetFeedback');
+
+            if (pwd !== confirmPwd) {
+                feedback.className = 'small text-danger fw-bold mb-2';
+                feedback.innerText = '✕ Passwords do not match!';
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitNewPassword');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Resetting Password...';
+
+            fetch('/api/forgot-password/reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier: verifiedIdentifier, otp, password: pwd })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Reset Password & Log In';
+
+                if (data.success) {
+                    const banner = document.getElementById('mobileSmsBanner');
+                    const bannerText = document.getElementById('mobileSmsBannerText');
+                    if (banner && bannerText && data.sms_alert) {
+                        bannerText.innerText = "🔔 " + data.sms_alert;
+                        banner.style.display = "block";
+                    }
+
+                    setTimeout(() => {
+                        alert(data.message || 'Password reset successfully! Security SMS notification sent to your mobile number.');
+                        if (data.redirect) {
+                            localStorage.setItem('eldergo_username', data.user.username);
+                            localStorage.setItem('eldergo_role', data.user.role);
+                            window.location.href = '/' + data.redirect.replace(/^\//, '');
+                        } else {
+                            location.reload();
+                        }
+                    }, 800);
+                } else {
+                    feedback.className = 'small text-danger fw-bold mb-2';
+                    feedback.innerText = '✕ ' + (data.message || 'Error resetting password.');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Reset Password & Log In';
+                alert('Server error resetting password: ' + err);
+            });
+        });
+    }
 </script>
 
 <!-- Authentication Helper -->

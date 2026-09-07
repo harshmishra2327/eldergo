@@ -25,7 +25,7 @@ function updateNavbarBasedOnLogin() {
         // Replace Register button with Dashboard button if it exists
         if (navRegisterBtn) {
             navRegisterBtn.innerHTML = '<i class="fa-solid fa-gauge-high me-1"></i> Dashboard';
-            navRegisterBtn.href = role === 'admin' ? 'admin_dasboard.html' : (role === 'companion' ? 'companion_dasboard.html' : 'client_dashboard.html');
+            navRegisterBtn.href = role === 'admin' ? '/admin-dashboard' : (role === 'companion' ? '/companion-dashboard' : '/client-dashboard');
             navRegisterBtn.className = 'btn btn-primary nav-dashboard-btn';
             navRegisterBtn.onclick = null;
         }
@@ -33,13 +33,13 @@ function updateNavbarBasedOnLogin() {
         // User is not logged in - show Login and Register
         if (navLoginBtn) {
             navLoginBtn.innerHTML = 'Login';
-            navLoginBtn.href = 'login.html';
+            navLoginBtn.href = '/login';
             navLoginBtn.onclick = null;
             navLoginBtn.className = 'btn btn-outline-primary nav-login-btn';
         }
         if (navRegisterBtn) {
             navRegisterBtn.innerHTML = 'Register';
-            navRegisterBtn.href = 'register.html';
+            navRegisterBtn.href = '/register';
             navRegisterBtn.className = 'btn btn-primary nav-register-btn';
             navRegisterBtn.onclick = null;
         }
@@ -47,15 +47,21 @@ function updateNavbarBasedOnLogin() {
 }
 
 function logout() {
-    // Clear all authentication data
-    localStorage.removeItem('eldergo_username');
-    localStorage.removeItem('eldergo_role');
-    
-    // Redirect to home page
-    window.location.href = 'index.html';
+    fetch('/api/logout', { method: 'POST' })
+        .then(() => {
+            localStorage.removeItem('eldergo_username');
+            localStorage.removeItem('eldergo_role');
+            window.location.href = '/';
+        })
+        .catch(() => {
+            localStorage.removeItem('eldergo_username');
+            localStorage.removeItem('eldergo_role');
+            window.location.href = '/';
+        });
 }
 
 // Run on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateNavbarBasedOnLogin();
 });
+
